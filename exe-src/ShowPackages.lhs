@@ -10,7 +10,7 @@ to output package versions as well
 to exclude system packages
 to collect the tarballs for all these packages
 
-> import Development.Pot.Modules
+> import Distribution.Pot.Modules
 > import System.Environment
 > import Control.Applicative
 > import Data.List

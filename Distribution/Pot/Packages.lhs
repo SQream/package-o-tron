@@ -1,12 +1,14 @@
 
-> module Development.Pot.Packages (readPackages) where
+> module Distribution.Pot.Packages (readPackages) where
 
 > import Data.List
 > import System.Process
 > import Text.Groom
 
-returns a map from package name to the modules in that package
 
+> -- | returns a map from package name to the names of the modules in
+> --   that package. The information is from the output of ghc-pkg dump, so
+> --   only includes information from installed packages
 > readPackages :: IO [(String,[String])]
 > readPackages = do
 >   inf <- readProcess "ghc-pkg" ["dump"] ""

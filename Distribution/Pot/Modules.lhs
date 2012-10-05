@@ -11,7 +11,7 @@ dependencies can be used for a build tool, and the non-local ones for
 determining which packages are referenced)
 
 > {-# LANGUAGE TupleSections #-}
-> module Development.Pot.Modules
+> module Distribution.Pot.Modules
 >     (ModuleInfo(..)
 >     ,modulesInfo
 >     ,showmi
@@ -23,7 +23,7 @@ determining which packages are referenced)
 > import System.FilePath
 > import Text.Groom
 > import Data.List
-> import Development.Pot.Packages
+> import Distribution.Pot.Packages
 > import Control.Arrow
 
 > parseImports :: String -> [String]
@@ -48,6 +48,7 @@ the modules
 >        map ((dir,) . makeRelative dir) `fmap`
 >        F.find (return True) (F.extension ==? ".lhs" ||? F.extension ==? ".hs") dir
 
+> -- | The collected information on one module
 > data ModuleInfo =
 >     ModuleInfo
 >     {miFileName :: FilePath
@@ -60,7 +61,12 @@ the modules
 >     ,miTransitivePackages :: [String]
 >     } deriving Show
 
-> modulesInfo :: [FilePath] -> IO [(FilePath,ModuleInfo)]
+
+> -- | Takes a set of source files and gets the ModuleInfo information
+> --   for all of them
+> modulesInfo :: [FilePath] -- ^ the root folders containing the source files
+>                           -- to analyze
+>             -> IO [(FilePath,ModuleInfo)]
 > modulesInfo srcs = do
 >   lms <- getLocalModules srcs
 >   mps <- mapM (\(a,b) -> ((a,b),) `fmap` parseImports `fmap` readFile (a </> b)) lms
@@ -124,6 +130,7 @@ the modules
 >            p1 = mapMaybe pkg ms
 >        in sort $ nub p1
 
+> -- | helper to filter the two module lists according to some function
 > filterModules :: (String -> Bool) -> ModuleInfo -> ModuleInfo
 > filterModules f mi = mi {miPackages = filter f $ miPackages mi
 >                         ,miTransitivePackages = filter f $ miTransitivePackages mi}

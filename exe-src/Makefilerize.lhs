@@ -1,21 +1,24 @@
-Pass in the root folders contain the source
-Pass in a list of exe names of files
+Example of calling this file:
 
-Outputs:
-dependencies for each file similar to ghc -M
-for each local module do:
-blahblah.o : blahblah.lhs {each direct dependency as depend.hi}
-           $(HC) $(HC_OPTS) -hide-all-packages -package ... -c $<
+Makefilerize package-o-tron FLDS . exe-src EXES exe-src/Makefilerize exe-src/ShowPackages exe-src/CabalLint
 
-then do the exe compiles:
-supply the list of exes manually
-exename : exename.o {all the transitive deps .o}
-   $(HL) $(HL_OPTS) $(MANGLED_EXE_NAME) -o exe exe.o all the .o
-   + all the transitive packages
+write the packages to ignore first the the text 'FLDS'
+then write the folders which source appears in (same folders you would
+pass to -i with ghc) then the text 'EXES'
+write the paths to the exes
 
-then add support for out of tree building, two stage .o, .dyn_o
+It will generate rules to compile all the .o files and link the exes,
+with explicit package lists.
 
-> import Development.Pot.Modules
+See the included Makefile, autorules.mk file for an example of how to
+use this, and an example of what is output.
+
+TODO:
+
+support two stage .o, .dyn_o to get creation of .so with source that
+uses template haskell
+
+> import Distribution.Pot.Modules
 > import Data.List
 > import System.FilePath
 > import System.Environment

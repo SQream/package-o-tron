@@ -25,6 +25,9 @@ You could use a Makefile:
   in a cabal package, or if you want to integrate with existing
   Makefiles, e.g. for mixed haskell/c projects.
 
+See the Makefile and autorules.mk in the repo (link below) for an
+example of how this works.
+
 
 CabalLint
 
@@ -92,3 +95,7 @@ unpack the offending packages and alter their constraints to allow all
 the latest versions of packages automatically. Not completely safe of
 course, but I always end up doing this manually and it is really
 tedious.
+
+Repository: https://github.com/JakeWheat/package-o-tron
+
+Contact: jakewheatmail@gmail.com

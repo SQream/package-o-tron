@@ -22,7 +22,7 @@ verbose mode
 > import Distribution.PackageDescription.Parse
 > import Distribution.Verbosity
 > import Distribution.PackageDescription
-> import Development.Pot.Modules
+> import Distribution.Pot.Modules
 > import Control.Applicative
 > import Data.List
 > import Distribution.ModuleName hiding (main)
