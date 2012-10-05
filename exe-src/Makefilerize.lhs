@@ -28,20 +28,20 @@ then add support for out of tree building, two stage .o, .dyn_o
 >   objOf mi
 >   ++ " : " ++ intercalate " \\\n    " (miFileName mi : (map (fhiOf . fst) $ miLocalDependencies mi))
 >   ++ "\n\t-mkdir -p " ++ dropFileName (objOf mi)
->   ++ "\n\t$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD) "
+>   ++ "\n\t$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ "
 >   ++ intercalate " " (map ("-package " ++) $ addBase $ miPackages mi)
 >   ++ " -c $< -o " ++ objOf mi
->   ++ " \\\n        -i$(BUILD)" -- ++ intercalate ":" (sort $ nub $ map (("$(BUILD)" ++) . dropFileName . fst) $ miLocalDependencies mi)
+>   ++ " \\\n        -i$(BUILD)/" -- ++ intercalate ":" (sort $ nub $ map (("$(BUILD)" ++) . dropFileName . fst) $ miLocalDependencies mi)
 
 
 > objOf :: ModuleInfo -> FilePath
-> objOf = ("$(BUILD)" ++) . flip replaceExtension "o" . miModuleFile
+> objOf = ("$(BUILD)/" ++) . flip replaceExtension "o" . miModuleFile
 > fobjOf :: (FilePath,FilePath) -> FilePath
-> fobjOf = ("$(BUILD)" ++) . flip replaceExtension "o" . snd
+> fobjOf = ("$(BUILD)/" ++) . flip replaceExtension "o" . snd
 > fhiOf :: (FilePath,FilePath) -> FilePath
-> fhiOf = ("$(BUILD)" ++) . flip replaceExtension "hi" . snd
+> fhiOf = ("$(BUILD)/" ++) . flip replaceExtension "hi" . snd
 > exeOf :: ModuleInfo -> FilePath
-> exeOf = ("$(BUILD)" ++) . takeFileName . dropExtension . miModuleFile
+> exeOf = ("$(BUILD)/" ++) . takeFileName . dropExtension . miModuleFile
 
 > addBase :: [String] -> [String]
 > addBase x | "base" `elem` x = x
@@ -51,7 +51,7 @@ then add support for out of tree building, two stage .o, .dyn_o
 > exeLink mi =
 >   exeOf mi ++ " : "
 >   ++ intercalate " \\\n    " (objOf mi : (map (fobjOf . fst) $ miLocalTransitiveDependencies mi))
->   ++ "\n\t-mkdir -p $(BUILD)"
+>   ++ "\n\t-mkdir -p $(BUILD)/"
 >   ++ "\n\t$(HL) $(HL_OPTS) $(" ++ mangledExeName (miFileName mi)
 >   ++ ") \\\n    "
 >   ++ intercalate " \\\n    "
@@ -71,8 +71,9 @@ then add support for out of tree building, two stage .o, .dyn_o
 > main :: IO ()
 > main = do
 >   args <- getArgs
->   let (modules,exes) = second (drop 1) $ break (=="EXES") args
->   mis <- modulesInfo modules
+>   let (hidepacks,args') = second (drop 1) $ break (=="FLDS") args
+>       (modules,exes) = second (drop 1) $ break (=="EXES") args'
+>   mis <- map (second $ hidePackage hidepacks) `fmap` modulesInfo modules
 >   putStrLn $ intercalate "\n\n" $ map (moduleCompile . snd) mis
 >   let exeMis = map exeMi exes
 >       exeMi exe = fromMaybe
@@ -82,4 +83,7 @@ then add support for out of tree building, two stage .o, .dyn_o
 >                   $ find ((== exe) . dropExtension . miFileName . snd) mis
 >   putStrLn $ intercalate "\n\n" $ map (exeLink . snd) exeMis
 >   putStrLn "\n\n%.hi : %.o\n\t@:"
+>   where
+>     hidePackage ps m = m {miPackages = filter (`notElem` ps) $ miPackages m
+>                          ,miTransitivePackages = filter (`notElem` ps) $ miTransitivePackages m}
 

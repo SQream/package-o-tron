@@ -1,0 +1,6 @@
+use a better name for 'Makefilerize'
+start working through the features and implementing them
+priorities:
+  lint for cabal files
+  prepare .tar.gz set
+  check cabal --dry-run for dups/ not latest version

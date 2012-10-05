@@ -7,7 +7,6 @@ list of directly referenced packages
 
 > import Development.Pot.Modules
 > import System.Environment
-> import Control.Arrow
 > import Control.Applicative
 > import Data.List
 

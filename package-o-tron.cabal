@@ -13,11 +13,9 @@ cabal-version:       >=1.8
 
 library
   exposed-modules:     Development.Pot.Packages, Development.Pot.Modules
-  -- other-modules:       
   build-depends:       base,groom,process,filepath,filemanip
-
 
 executable Makefilerize
   build-depends:  base,filepath,groom,process,filemanip
   main-is:        Makefilerize.lhs
-  hs-source-dirs: .
+  hs-source-dirs: .,exe-src
