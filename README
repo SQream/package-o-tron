@@ -2,89 +2,93 @@ Package-o-tron is a collection of utilities to help managing cabal
 files for your projects, maintaining Makefiles and other build
 systems, and also some which help with your package database.
 
+
+The central code is a function which takes a list of folders, then
+parses all the imports in all the haskell source in these folders. It
+then creates the dependency information between the different files,
+and the dependency on packages information (using ghc-pkg dump)
+
+
 Currently implemented:
 
-The Makefile gives an example of how to use package-o-tron to help
-manage a makefile for haskell projects, using the Makefilerize
-command.
+The Makefile in the package-o-tron package gives an example of how to
+use package-o-tron to help manage a makefile for haskell projects,
+using the Makefilerize command.
+
+You could use a Makefile:
+
+* to quickly develop when you have multiple .cabal projects and don't
+  want to spend time reinstalling them when you do a rebuild (this can
+  also be much faster if you use -j and have lots of executables)
+
+* if you have files to compile as part of the development which aren't
+  in a cabal package, or if you want to integrate with existing
+  Makefiles, e.g. for mixed haskell/c projects.
+
+
+CabalLint
 
 CabalLint will check the following issues in your cabal file:
-  missing and superfluous other-modules and build-deps in library,exe
-    and test sections
-  version ranges which exclude the latest versions of a build-dep
-    (just uses packdeps from hackage)
+
+*  missing and superfluous other-modules and build-deps in library,exe
+   and test sections
+
+*  version ranges which exclude the latest versions of a build-dep
+   (just uses packdeps from hackage)
+
 run it like this:
 CabalLint package-o-tron.cabal
 No output means everything OK
 
-----
+ShowPackages
 
-The central code is a function which takes a list of folders, finds
-all the haskell source files in those folders, and then calculates the
-dependencies: for each source file, it calculates which other source
-files it depends on, and which packages it depends on. (You have to
-have the packages needed already installed on your system - so this
-can be used to document exactly which packages are needed for files
-which are not compiled with cabal-install).
-
-This can be used to create makefiles.
-
-There are the following utilities for helping to manage the cabal file
-for your project:
-
-* list any files in your source folders which aren't included in the
-  cabal tar.gz, i.e. not in extra-files, exposed-modules,
-  other-modules, exe, test, benchmark
-* check that there are no unnecessary packages in build-depends sections
-* check the other modules sections include exactly the correct files
-* treat the extensions section as documentation: check this is in sync
-  with the language pragmas in your source
-
-It can use the http://hackage.haskell.org/package/packdeps package to
-check that the upper bounds in your cabal file don't exclude newer
-versions on hackage, included here to avoid installing multiple tools
-manually.
-
-There is a utility to take your cabal project(s), sdist them and then
-compile them under /tmp and run tests to check they work.
-
-Can dump the set of packages referenced by the modules in a set of
-folders. Can also do a recursive dump of the all the packages
-referenced by these.
-
-Version analysis:
-tests install with lowest and highest versions in cabal
-can try out lower version to see if they works
-tests with different versions of cabal
-tests with different versions of ghc
-
-Makefile support:
-
-can use the dependency information to create something similar to the
-output of ghc -M, but with packages mentioned also. Also creates rules
-for building exes, including the packages and the objects mentioned
-explicitly
-
-Blessed package collection support:
-run this command on a set of source files
-it will calculate all the package dependencies
-and copy .tar.gz for all these modules from your .cabal
-now you can create a fresh install of packages using this
-fixed set of .tar.gz using cabal for repeatable setups
-
-Package database tools:
-can check if any packages have multiple versions installed
-can check if any installed packages aren't the latest version
-can check cabal --dry-run to see if any installs will be reinstalls/
-installing another version of an already installed package, and can
-check if any new installs aren't the latest version
-
-Third party package hacker:
-
-when you want to install a set of packages, and one or more of them or
-their dependencies has upper bounds which prevents the latest version
-of some package being install, it can cabal unpack the offending
-packages and automatically update the dependencies and install. This
-almost always works when I do it by hand and it is really tedious.
+Run on a set of source folders, and it will show you all the packages
+referenced by the source in those folders
 
 
+Planned utils:
+
+Showpackages: extend to show indirectly depended on packages also
+
+blessed package set creation: run on some folders to get a package
+list. Then it follows the package dependencies to get all the needed
+non-system packages. Then it looks in your .cabal and copies out the
+tarballs for all these packages. Now you can create a fresh install in
+a sandbox or fresh machine without needing an internet connection, or
+worrying about if hackage is down, or if the latest set of packages
+don't install.
+
+Cabal build testing
+
+Use sandboxing to check the sdists from a .cabal install without error
+and if there are tests they run and pass. The sandboxing is used to
+check a range of versions of ghc crossed with the lowest and latest
+versions of the dependencies listed in the .cabal. Later, maybe this
+can be extended to search earlier versions of dependencies to get more
+accurate lower bounds.
+
+Package database lint:
+
+check your ghc package database for the following issues:
+duplicate packages installed
+packages which aren't the latest versions installed
+not sure how to automatically help with these situations though
+
+Third party cabal install checker:
+
+run a wrapper around cabal-install ... --dry-run. reports:
+any reinstalls (easy since cabal already does this)
+any different versions of already installed packages would be
+  installed
+any versions of packages which aren't the latest of those packages
+  would be installed
+
+Third party cabal file hacker:
+
+when you try to install a lot of packages, and some of them have
+version constraints on their dependencies which lead to another
+package being installed not at the latest version: this will cabal
+unpack the offending packages and alter their constraints to allow all
+the latest versions of packages automatically. Not completely safe of
+course, but I always end up doing this manually and it is really
+tedious.

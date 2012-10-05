@@ -1,15 +1,21 @@
-use a better name for 'Makefilerize'
-start working through the features and implementing them
-priorities:
-  lint for cabal files
-    list files in project which aren't included in .cabal
-    check for unnecessary packages in build-depends
-    check exact file list in other-module sections
-    check the upper bounds
-  prepare .tar.gz set
-  check cabal --dry-run for dups/ not latest version
-  tester: use sandboxing to:
-    compile and run tests, check they pass
-    check ghc versions: target 7.0.x through 7.6
-    check it works with all the latest packages on each ghc
-    check it works with all the minimum bounds on each ghc
+find a better name for 'Makefilerize'
+lint: duplicate listing, unreferenced files, extensions, benchmark
+   sections
+fix the dump exes
+
+blessed .tar.gz set generation
+
+check cabal --dry-run for dups/ not latest version
+
+package database checker: dup versions, non latest versions
+
+tester: use sandboxing to:
+    compile and run tests -> successful compile and successful test
+      run is the validation
+    start with the sdist tarball
+    check ghc versions: target 7.0.x through 7.6.x
+    check it works with all the latest package versions in the
+      dependency ranges on each ghc
+    check it works with all the earliest "
+
+third party package hacker

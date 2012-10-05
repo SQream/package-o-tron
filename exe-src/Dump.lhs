@@ -1,4 +1,8 @@
 
+Dumps the parsed file and package dependency information for a set of
+files
+
+
 > import Development.Pot.Modules
 > import System.Environment
 

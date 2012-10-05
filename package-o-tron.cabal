@@ -1,7 +1,10 @@
 name:                package-o-tron
 version:             0.1.0.0
 synopsis:            Utilities for working with cabal packages and your package database
---description:         
+
+description:         Contains a utility to help managing Makefiles for Haskell projects,
+                     and a CabalLint program which can check the other-modules and
+                     build-deps sections in your cabal files.
 license:             BSD3
 license-file:        LICENSE
 author:              Jake Wheat
@@ -11,18 +14,29 @@ category:            Development
 build-type:          Simple
 cabal-version:       >=1.8
 
+extra-source-files:  autorules.mk
+                     LICENSE
+                     README
+                     Makefile
+                     todo
 library
-  exposed-modules:     Development.Pot.Packages, Development.Pot.Modules
-  build-depends:       base,groom,process,filepath,filemanip
+  exposed-modules:  Development.Pot.Packages, Development.Pot.Modules
+  build-depends:    base,groom,process,filepath,filemanip
 
 executable Makefilerize
-  build-depends:  base,filepath,groom,process,filemanip
-  main-is:        Makefilerize.lhs
-  hs-source-dirs: .,exe-src
-  other-modules:     Development.Pot.Packages, Development.Pot.Modules
+  build-depends:    base,filepath,groom,process,filemanip
+  main-is:          Makefilerize.lhs
+  hs-source-dirs:   .,exe-src
+  other-modules:    Development.Pot.Packages, Development.Pot.Modules
 
 executable CabalLint
-  build-depends:  base,filepath,groom,process,filemanip,Cabal,packdeps
-  main-is:        CabalLint.lhs
-  hs-source-dirs: .,exe-src
-  other-modules:     Development.Pot.Packages, Development.Pot.Modules
+  build-depends:    base,filepath,groom,process,filemanip,Cabal,packdeps
+  main-is:          CabalLint.lhs
+  hs-source-dirs:   .,exe-src
+  other-modules:    Development.Pot.Packages, Development.Pot.Modules
+
+executable ShowPackages
+  build-depends:    base,filepath,groom,process,filemanip
+  main-is:          ShowPackages.lhs
+  hs-source-dirs:   .,exe-src
+  other-modules:    Development.Pot.Packages, Development.Pot.Modules

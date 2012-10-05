@@ -1,5 +1,6 @@
 
-
+Used for testing: just dump the parsed installed package list to check
+the ghc-pkg dump parser.
 
 > import Development.Pot.Packages
 > import Data.List

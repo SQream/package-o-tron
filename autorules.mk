@@ -14,11 +14,6 @@ $(BUILD)/Setup.o : ./Setup.hs
 	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ -package base -package Cabal -c $< -o $(BUILD)/Setup.o \
         -i$(BUILD)/
 
-$(BUILD)/dist/build/autogen/Paths_package_o_tron.o : ./dist/build/autogen/Paths_package_o_tron.hs
-	-mkdir -p $(BUILD)/dist/build/autogen/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ -package base -c $< -o $(BUILD)/dist/build/autogen/Paths_package_o_tron.o \
-        -i$(BUILD)/
-
 $(BUILD)/exe-src/CabalLint.o : ./exe-src/CabalLint.lhs \
     $(BUILD)/Development/Pot/Modules.hi
 	-mkdir -p $(BUILD)/exe-src/
