@@ -131,13 +131,3 @@ the modules
 
 > showmi :: [(FilePath,ModuleInfo)] -> String
 > showmi = intercalate "\n\n" . map (\(f,i) -> f ++ "\n" ++ groom i)
-
-1. call command line with source folders
-2. gets all the source files in these source folders
-3. gets all the modules for each source file
-4. splits the module list for each source into local and non local
-5. for the non local lists, find the set of packages which contain these modules
-5. outputs: for each file
-   -> the list of immediate dependency local files -> full relative paths
-   -> the transitive list of all local dependency files -> full relative paths
-   -> the transitive list of packages for this file and all referenced local modules

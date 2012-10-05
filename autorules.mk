@@ -19,6 +19,12 @@ $(BUILD)/dist/build/autogen/Paths_package_o_tron.o : ./dist/build/autogen/Paths_
 	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ -package base -c $< -o $(BUILD)/dist/build/autogen/Paths_package_o_tron.o \
         -i$(BUILD)/
 
+$(BUILD)/exe-src/CabalLint.o : ./exe-src/CabalLint.lhs \
+    $(BUILD)/Development/Pot/Modules.hi
+	-mkdir -p $(BUILD)/exe-src/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ -package Cabal -package base -package filepath -package packdeps -c $< -o $(BUILD)/exe-src/CabalLint.o \
+        -i$(BUILD)/
+
 $(BUILD)/exe-src/Dump.o : ./exe-src/Dump.lhs \
     $(BUILD)/Development/Pot/Modules.hi
 	-mkdir -p $(BUILD)/exe-src/
@@ -41,6 +47,12 @@ $(BUILD)/exe-src/ShowPackages.o : ./exe-src/ShowPackages.lhs \
     $(BUILD)/Development/Pot/Modules.hi
 	-mkdir -p $(BUILD)/exe-src/
 	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ -package base -c $< -o $(BUILD)/exe-src/ShowPackages.o \
+        -i$(BUILD)/
+
+$(BUILD)/CabalLint.o : exe-src/CabalLint.lhs \
+    $(BUILD)/Development/Pot/Modules.hi
+	-mkdir -p $(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ -package Cabal -package base -package filepath -package packdeps -c $< -o $(BUILD)/CabalLint.o \
         -i$(BUILD)/
 
 $(BUILD)/Dump.o : exe-src/Dump.lhs \
@@ -124,6 +136,24 @@ $(BUILD)/ShowPackages : $(BUILD)/ShowPackages.o \
     -package filemanip \
     -package filepath \
     -package groom \
+    -package process
+
+$(BUILD)/CabalLint : $(BUILD)/CabalLint.o \
+    $(BUILD)/Development/Pot/Modules.o \
+    $(BUILD)/Development/Pot/Packages.o
+	-mkdir -p $(BUILD)/
+	$(HL) $(HL_OPTS) $(CABALLINT_EXTRA) \
+    -o $(BUILD)/CabalLint \
+    $(BUILD)/CabalLint.o \
+    $(BUILD)/Development/Pot/Modules.o \
+    $(BUILD)/Development/Pot/Packages.o \
+    -hide-all-packages \
+    -package Cabal \
+    -package base \
+    -package filemanip \
+    -package filepath \
+    -package groom \
+    -package packdeps \
     -package process
 
 

@@ -2,10 +2,20 @@ Package-o-tron is a collection of utilities to help managing cabal
 files for your projects, maintaining Makefiles and other build
 systems, and also some which help with your package database.
 
-Most of this isn't implemented yet.
+Currently implemented:
 
 The Makefile gives an example of how to use package-o-tron to help
-manage a makefile for haskell projects.
+manage a makefile for haskell projects, using the Makefilerize
+command.
+
+CabalLint will check the following issues in your cabal file:
+  missing and superfluous other-modules and build-deps in library,exe
+    and test sections
+  version ranges which exclude the latest versions of a build-dep
+    (just uses packdeps from hackage)
+run it like this:
+CabalLint package-o-tron.cabal
+No output means everything OK
 
 ----
 
@@ -25,7 +35,7 @@ for your project:
 * list any files in your source folders which aren't included in the
   cabal tar.gz, i.e. not in extra-files, exposed-modules,
   other-modules, exe, test, benchmark
-* check that there are no unneccessary packages in build-depends sections
+* check that there are no unnecessary packages in build-depends sections
 * check the other modules sections include exactly the correct files
 * treat the extensions section as documentation: check this is in sync
   with the language pragmas in your source

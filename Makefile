@@ -10,7 +10,8 @@ SRC_DIRS = . exe-src
 
 # the names of exe files to compile (these need to be the full paths
 # from the Makefile). You have to use ./ prefix if it is in the root folder
-EXE_FILES = exe-src/Makefilerize exe-src/Dump exe-src/DumpPackageDB exe-src/ShowPackages
+EXE_FILES = exe-src/Makefilerize exe-src/Dump exe-src/DumpPackageDB \
+        exe-src/ShowPackages exe-src/CabalLint
 
 # folder to put build and exe files in
 BUILD = build

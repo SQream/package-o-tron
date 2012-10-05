@@ -19,3 +19,10 @@ executable Makefilerize
   build-depends:  base,filepath,groom,process,filemanip
   main-is:        Makefilerize.lhs
   hs-source-dirs: .,exe-src
+  other-modules:     Development.Pot.Packages, Development.Pot.Modules
+
+executable CabalLint
+  build-depends:  base,filepath,groom,process,filemanip,Cabal,packdeps
+  main-is:        CabalLint.lhs
+  hs-source-dirs: .,exe-src
+  other-modules:     Development.Pot.Packages, Development.Pot.Modules
