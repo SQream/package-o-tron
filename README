@@ -26,7 +26,9 @@ You could use a Makefile:
   Makefiles, e.g. for mixed haskell/c projects.
 
 See the Makefile and autorules.mk in the repo (link below) for an
-example of how this works.
+example of how this works. This tool is used in the hssqlppp project
+Makefile (https://github.com/JakeWheat/hssqlppp), see the Makefile and
+autorules.mk there for another example.
 
 
 CabalLint
@@ -43,15 +45,17 @@ run it like this:
 CabalLint package-o-tron.cabal
 No output means everything OK
 
+
 ShowPackages
 
 Run on a set of source folders, and it will show you all the packages
 referenced by the source in those folders
 
 
+
 Planned utils:
 
-Showpackages: extend to show indirectly depended on packages also
+Showpackages: extend to show indirectly depended on packages as well
 
 blessed package set creation: run on some folders to get a package
 list. Then it follows the package dependencies to get all the needed
@@ -95,6 +99,8 @@ unpack the offending packages and alter their constraints to allow all
 the latest versions of packages automatically. Not completely safe of
 course, but I always end up doing this manually and it is really
 tedious.
+
+
 
 Repository: https://github.com/JakeWheat/package-o-tron
 

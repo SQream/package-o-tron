@@ -1,6 +1,6 @@
 
-# Example makefile which can compile the source for this project
-# also look in the autorules.mk to see the automatically generated
+# Example makefile which can compile the source for this project.
+# Look in the autorules.mk to see the automatically generated
 # support. You can regenerate the autorules.mk using the autorules
 # rule
 
@@ -48,13 +48,10 @@ all : $(EXE_FILES_TARGETS)
 
 # regenerate the dependency and rules for exe compiles
 # use cabal configure && cabal build to make the Makefilerize exe
-# before the FLDS is the packages not to reference in the build rules
-# usually, you want to put any packages which this make file also builds
-# in here
 .PHONY : autorules
 autorules :
 	Makefilerize package-o-tron FLDS $(SRC_DIRS) EXES $(EXE_FILES) > \
-	autorules.mk
+            autorules.mk
 
 .PHONY : clean
 clean :
