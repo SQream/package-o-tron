@@ -1,0 +1,23 @@
+name:                package-o-tron
+version:             0.1.0.0
+synopsis:            Utilities for working with cabal packages and your package database
+--description:         
+license:             BSD3
+license-file:        LICENSE
+author:              Jake Wheat
+maintainer:          jakewheatmail@gmail.com
+copyright:           Jake Wheat 2012
+category:            Development
+build-type:          Simple
+cabal-version:       >=1.8
+
+library
+  exposed-modules:     Development.Pot.Packages, Development.Pot.Modules
+  -- other-modules:       
+  build-depends:       base,groom,process,filepath,filemanip
+
+
+executable Makefilerize
+  build-depends:  base,filepath,groom,process,filemanip
+  main-is:        Makefilerize.lhs
+  hs-source-dirs: .

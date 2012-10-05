@@ -1,0 +1,80 @@
+Package-o-tron is a collection of utilities to help managing cabal
+files for your projects, maintaining Makefiles and other build
+systems, and also some which help with your package database.
+
+Most of this isn't implemented yet.
+
+The Makefile gives an example of how to use package-o-tron to help
+manage a makefile for haskell projects.
+
+----
+
+The central code is a function which takes a list of folders, finds
+all the haskell source files in those folders, and then calculates the
+dependencies: for each source file, it calculates which other source
+files it depends on, and which packages it depends on. (You have to
+have the packages needed already installed on your system - so this
+can be used to document exactly which packages are needed for files
+which are not compiled with cabal-install).
+
+This can be used to create makefiles.
+
+There are the following utilities for helping to manage the cabal file
+for your project:
+
+* list any files in your source folders which aren't included in the
+  cabal tar.gz, i.e. not in extra-files, exposed-modules,
+  other-modules, exe, test, benchmark
+* check that there are no unneccessary packages in build-depends sections
+* check the other modules sections include exactly the correct files
+* treat the extensions section as documentation: check this is in sync
+  with the language pragmas in your source
+
+It can use the http://hackage.haskell.org/package/packdeps package to
+check that the upper bounds in your cabal file don't exclude newer
+versions on hackage, included here to avoid installing multiple tools
+manually.
+
+There is a utility to take your cabal project(s), sdist them and then
+compile them under /tmp and run tests to check they work.
+
+Can dump the set of packages referenced by the modules in a set of
+folders. Can also do a recursive dump of the all the packages
+referenced by these.
+
+Version analysis:
+tests install with lowest and highest versions in cabal
+can try out lower version to see if they works
+tests with different versions of cabal
+tests with different versions of ghc
+
+Makefile support:
+
+can use the dependency information to create something similar to the
+output of ghc -M, but with packages mentioned also. Also creates rules
+for building exes, including the packages and the objects mentioned
+explicitly
+
+Blessed package collection support:
+run this command on a set of source files
+it will calculate all the package dependencies
+and copy .tar.gz for all these modules from your .cabal
+now you can create a fresh install of packages using this
+fixed set of .tar.gz using cabal for repeatable setups
+
+Package database tools:
+can check if any packages have multiple versions installed
+can check if any installed packages aren't the latest version
+can check cabal --dry-run to see if any installs will be reinstalls/
+installing another version of an already installed package, and can
+check if any new installs aren't the latest version
+
+Third party package hacker:
+
+when you want to install a set of packages, and one or more of them or
+their dependencies has upper bounds which prevents the latest version
+of some package being install, it can cabal unpack the offending
+packages and automatically update the dependencies and install. This
+almost always works when I do it by hand and it is really tedious.
+
+
