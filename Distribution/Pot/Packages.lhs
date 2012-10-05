@@ -24,7 +24,7 @@
 >     parseModules _ nm [] = error $ "didn't find exposed-modules for package " ++ nm
 >     parseMoreModules acc nm macc ((' ':f):v) = parseMoreModules acc nm (f:macc) v
 >     parseMoreModules acc nm macc v =
->       let ms = (nm, words $ intercalate " " macc)
+>       let ms = (nm, words $ unwords macc)
 >       in parsePackages (ms:acc) v
 
 > kludgePackages :: [(String,[String])] -> [(String,[String])]

@@ -100,7 +100,7 @@ verbose mode
 >     checkModulesAndPackages allMis si = do
 >          let rootModules = map moduleString $ siModRoots si
 >              mis = filter ((`elem` rootModules) . miModuleName . snd) allMis
->              filesModules = (sort $ nub $ concatMap (map snd . miLocalTransitiveDependencies . snd) mis)
+>              filesModules = sort $ nub $ concatMap (map snd . miLocalTransitiveDependencies . snd) mis
 >              filesPackages = sort $ nub $ concatMap (miTransitivePackages . snd) mis
 >              cabalOms = map moduleString (siOtherMods si)
 >              cabalPackages = map dependencyName (siBuildDeps si)
@@ -115,11 +115,10 @@ verbose mode
 >   di2 <- case mdi of
 >                  Just di2 -> return di2
 >                  Nothing -> error $ "Could not parse cabal file: " ++ fp
->   allGood <- case checkDeps newest di2 of
->             (_pn, _v, AllNewest) -> do
+>   case checkDeps newest di2 of
+>             (_pn, _v, AllNewest) ->
 >                 return True
 >             (_pn, _v, WontAccept p _) -> do
 >                 putStrLn "Cannot accept the following packages"
 >                 forM_ p $ \(x, y) -> putStrLn $ x ++ " " ++ y
 >                 return False
->   return allGood

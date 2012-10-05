@@ -29,12 +29,12 @@ uses template haskell
 > moduleCompile :: ModuleInfo -> String
 > moduleCompile mi =
 >   objOf mi
->   ++ " : " ++ intercalate " \\\n    " (miFileName mi : (map (fhiOf . fst) $ miLocalDependencies mi))
+>   ++ " : " ++ intercalate " \\\n    " (miFileName mi : map (fhiOf . fst) (miLocalDependencies mi))
 >   ++ "\n\t-mkdir -p " ++ dropFileName (objOf mi)
 >   ++ "\n\t$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ "
->   ++ intercalate " " (map ("-package " ++) $ addBase $ miPackages mi)
+>   ++ unwords (map ("-package " ++) $ addBase $ miPackages mi)
 >   ++ " -c $< -o " ++ objOf mi
->   ++ " \\\n        -i$(BUILD)/" -- ++ intercalate ":" (sort $ nub $ map (("$(BUILD)" ++) . dropFileName . fst) $ miLocalDependencies mi)
+>   ++ " \\\n        -i$(BUILD)/"
 
 
 > objOf :: ModuleInfo -> FilePath
@@ -53,15 +53,15 @@ uses template haskell
 > exeLink :: ModuleInfo -> String
 > exeLink mi =
 >   exeOf mi ++ " : "
->   ++ intercalate " \\\n    " (objOf mi : (map (fobjOf . fst) $ miLocalTransitiveDependencies mi))
+>   ++ intercalate " \\\n    " (objOf mi : map (fobjOf . fst) (miLocalTransitiveDependencies mi))
 >   ++ "\n\t-mkdir -p $(BUILD)/"
 >   ++ "\n\t$(HL) $(HL_OPTS) $(" ++ mangledExeName (miFileName mi)
 >   ++ ") \\\n    "
 >   ++ intercalate " \\\n    "
 >      (["-o " ++ exeOf mi, objOf mi]
->       ++ (map (fobjOf . fst) $ miLocalTransitiveDependencies mi)
+>       ++ map (fobjOf . fst) (miLocalTransitiveDependencies mi)
 >       ++ ["-hide-all-packages"]
->       ++ (map ("-package " ++) $ addBase $ miTransitivePackages mi))
+>       ++ map ("-package " ++) (addBase $ miTransitivePackages mi))
 >   where
 >     mangledExeName = (++ "_EXTRA")
 >                      . map toUpper
