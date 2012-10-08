@@ -12,12 +12,12 @@ to collect the tarballs for all these packages
 
 > import Distribution.Pot.Modules
 > import System.Environment
-> import Control.Applicative
+> --import Control.Applicative
 > import Data.List
 
 > main :: IO ()
 > main = do
 >   args <- getArgs
->   mi <- map snd <$> modulesInfo args
->   let ps = sort $ nub $ concatMap miPackages mi
+>   mi <- modulesInfo args
+>   let ps = sort $ nub $ concatMap miDirectDeepPackages mi
 >   putStrLn $ intercalate "\n" ps

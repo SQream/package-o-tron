@@ -5,9 +5,11 @@ files
 
 > import Distribution.Pot.Modules
 > import System.Environment
+> import Data.List
+> --import Text.Groom
 
 > main :: IO ()
 > main = do
 >   args <- getArgs
->   mi <- modulesInfo args
->   putStrLn $ showmi mi
+>   mis <- modulesInfo args
+>   putStrLn $ intercalate "\n\n" $ map ppMI mis

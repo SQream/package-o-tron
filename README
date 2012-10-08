@@ -13,7 +13,7 @@ Currently implemented:
 
 The Makefile in the package-o-tron package gives an example of how to
 use package-o-tron to help manage a makefile for haskell projects,
-using the Makefilerize command.
+using the MakeHaskellMake command.
 
 You could use a Makefile:
 

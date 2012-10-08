@@ -1,5 +1,5 @@
 name:                package-o-tron
-version:             0.1.0.0
+version:             0.2.0.0
 synopsis:            Utilities for working with cabal packages and your package database
 
 description:         Utility to help managing Makefiles for Haskell projects, a cabal lint
@@ -24,7 +24,6 @@ extra-source-files:  autorules.mk
                      LICENSE
                      README
                      Makefile
-                     todo
 
 source-repository head
   type:     git
@@ -33,25 +32,23 @@ source-repository head
 library
   exposed-modules:  Distribution.Pot.Packages, Distribution.Pot.Modules
   build-depends:    base >= 4 && < 5,
-                    groom,process,filepath,filemanip
+                    process,filepath,filemanip
+  hs-source-dirs:   src
 
-executable Makefilerize
+executable MakeHaskellMake
   build-depends:    base >= 4 && < 5,
-                    filepath,groom,process,filemanip
-  main-is:          Makefilerize.lhs
-  hs-source-dirs:   .,exe-src
-  other-modules:    Distribution.Pot.Packages, Distribution.Pot.Modules
+                    filepath,process,filemanip,time,package-o-tron
+  main-is:          MakeHaskellMake.lhs
+  hs-source-dirs:   tools
 
 executable CabalLint
   build-depends:    base >= 4 && < 5,
-                    filepath,groom,process,filemanip,Cabal,packdeps
+                    filepath,process,filemanip,Cabal,packdeps,package-o-tron
   main-is:          CabalLint.lhs
-  hs-source-dirs:   .,exe-src
-  other-modules:    Distribution.Pot.Packages, Distribution.Pot.Modules
+  hs-source-dirs:   tools
 
 executable ShowPackages
   build-depends:    base >= 4 && < 5,
-                    filepath,groom,process,filemanip
+                    filepath,process,filemanip,package-o-tron
   main-is:          ShowPackages.lhs
-  hs-source-dirs:   .,exe-src
-  other-modules:    Distribution.Pot.Packages, Distribution.Pot.Modules
+  hs-source-dirs:   tools

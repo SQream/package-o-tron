@@ -1,13 +1,19 @@
-find a better name for 'Makefilerize'
-lint: duplicate listing, unreferenced files, extensions, benchmark
-   sections
-fix the dump exes
+clean up command line options for makefile stuff
+and for other things
 
 blessed .tar.gz set generation
+
+lint: duplicate listing, unreferenced files, extensions, benchmark
+   sections
+refactor and document the lint, makefiler and lib modules
+fix the dump exes
 
 check cabal --dry-run for dups/ not latest version
 
 package database checker: dup versions, non latest versions
+
+...
+
 
 tester: use sandboxing to:
     compile and run tests -> successful compile and successful test
@@ -19,3 +25,8 @@ tester: use sandboxing to:
     check it works with all the earliest "
 
 third party package hacker
+
+test the caballint on all the packages in hackage?
++ test other exes in this way
+
+produce a big dependency diagram showing modules and packages

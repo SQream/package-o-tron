@@ -6,12 +6,12 @@
 
 # the source directories where the haskell source roots are (paths
 # relative to this Makefile)
-SRC_DIRS = . exe-src
+SRC_DIRS = src tools
 
 # the names of exe files to compile (these need to be the full paths
 # from the Makefile). You have to use ./ prefix if it is in the root folder
-EXE_FILES = exe-src/Makefilerize exe-src/Dump exe-src/DumpPackageDB \
-        exe-src/ShowPackages exe-src/CabalLint
+EXE_FILES = tools/MakeHaskellMake tools/Dump tools/DumpPackageDB \
+        tools/ShowPackages tools/CabalLint
 
 # folder to put build and exe files in
 BUILD = build
@@ -47,10 +47,10 @@ all : $(EXE_FILES_TARGETS)
 -include autorules.mk
 
 # regenerate the dependency and rules for exe compiles
-# use cabal configure && cabal build to make the Makefilerize exe
+# use cabal configure && cabal build to make the exes
 .PHONY : autorules
 autorules :
-	Makefilerize package-o-tron FLDS $(SRC_DIRS) EXES $(EXE_FILES) > \
+	MakeHaskellMake package-o-tron FLDS $(SRC_DIRS) EXES $(EXE_FILES) > \
             autorules.mk
 
 .PHONY : clean
