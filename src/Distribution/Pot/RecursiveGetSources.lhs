@@ -11,7 +11,7 @@
 > import System.FilePath
 > import Control.Monad
 > import Data.List
-> import Distribution.Pot.Packages
+> import Distribution.Pot.InstalledPackages
 > import Control.Monad.State
 > import Control.Applicative
 > import Data.Maybe
@@ -32,8 +32,8 @@ etc. For robustness: add multiple packages and emit warning, if local
 source and one or more packages match, emit warning and use local
 source only, and if two local sources match only then error?
 
-> recursiveGetSources :: [FilePath] -> [FilePath] -> IO [AnnotatedSourceSyntaxInfo]
-> recursiveGetSources rootSources additionalRoots = do
+> recursiveGetSources :: [PackageInfo] -> [FilePath] -> [FilePath] -> IO [AnnotatedSSI]
+> recursiveGetSources pkgs rootSources additionalRoots = do
 >   -- read and parse the root sources
 >   rs <- forM rootSources $ \fn -> do
 >           f <- LT.readFile fn
@@ -43,19 +43,20 @@ source only, and if two local sources match only then error?
 >                        Nothing -> dropFileName fn
 >                        Just m | m == "Main" -> dropFileName fn
 >                        Just m -> let mfn = moduleNameToFileName m
->                                  in if isSuffixOf mfn fn
->                                     then reverse . drop (length mfn) . reverse $ fn
+>                                  in if isSuffixOf mfn $ dropExtension fn
+>                                     then reverse . drop (length mfn) . reverse $ dropExtension fn
 >                                     else error $ "module name doesn't match filename:\n"
->                                                  ++ T.unpack m ++ "\n" ++ fn
+>                                                  ++ T.unpack m ++ "\n" ++ fn ++ "\n" ++ mfn
 >           return (fn,(root,i))
 >   -- combine the roots from these with the additional roots
+>   -- maybe should just use something like -i instead of doing this automatically
 >   let allRoots = sort $ nub $
 >                  additionalRoots
 >                  ++ map (\x -> case fst $ snd x of
 >                               "" -> "."
 >                               y -> y) rs
+>   putStrLn $ show allRoots
 >   -- run the recursion
->   pkgs <- readPackages
 >   execStateT (mapM (uncurry $ annotate pkgs allRoots)
 >                     $ map (\(fn,(_,i)) -> (fn,i)) rs) []
 
@@ -72,9 +73,9 @@ memoized check for matching local source
  -> this also adds the local source to the running list
 also check the package list
 
-> type St = StateT [AnnotatedSourceSyntaxInfo] IO
+> type St = StateT [AnnotatedSSI] IO
 
-> annotate :: [PackageInf] -> [FilePath] -> FilePath -> SourceSyntaxInfo -> St ()
+> annotate :: [PackageInfo] -> [FilePath] -> FilePath -> SourceSyntaxInfo -> St ()
 > annotate pkgs roots fp ssi = do
 >   iis <- forM (ssiImports ssi) $ \ip -> do
 >            -- get the matching packages
@@ -85,7 +86,7 @@ also check the package list
 
 >   let a = ASSI {assiFilename = fp
 >                ,assiModuleName = ssiModuleName ssi
->                ,assiImports = iis}
+>                ,assiImports = sort $ nub $ iis}
 >   modify (a:)
 >   return ()
 >   where
@@ -109,7 +110,7 @@ also check the package list
 >           return $ catMaybes [a,b])
 >     tryRead :: FilePath -> St (Maybe ImportInfo)
 >     tryRead fn = do
->         lift $ putStrLn $ "checking: " ++ fn
+>         --lift $ putStrLn $ "checking: " ++ fn
 >         x <- lift $ doesFileExist fn
 >         if x
 >             then do

@@ -13,7 +13,11 @@ not sure if this information is available in Cabal or something
 
 
 
-> module Distribution.Pot.Packages (readPackages,lookupPackageForModule,PackageInf(..)) where
+> module Distribution.Pot.InstalledPackages
+>     (readPackages
+>     ,lookupPackageForModule
+>     ,PackageInfo(..)
+>     ) where
 
 > import Data.List
 > import System.Process
@@ -48,17 +52,17 @@ configCompiler :: Maybe CompilerFlavor -> Maybe FilePath -> Maybe FilePath -> Pr
 >   return $ allPackages pinf-}
 
 
-> lookupPackageForModule :: [PackageInf] -> String -> [String]
+> lookupPackageForModule :: [PackageInfo] -> String -> [String]
 > lookupPackageForModule pkgs m = do
 >   map piName $ filter ((m `elem`) . piExposedModules) pkgs
 
 > -- | returns a map from package name to the names of the modules in
 > --   that package. The information is from the output of ghc-pkg dump, so
 > --   only includes information from installed packages
-> readPackages :: IO [PackageInf] -- (String,[String])]
+> readPackages :: IO [PackageInfo] -- (String,[String])]
 > readPackages = do
 >   inf <- readProcess "ghc-pkg" ["dump"] ""
->   return $ kludgePackages $ parsePackages [] $ lines inf
+>   return $ parsePackages [] $ lines inf
 >   where
 >     -- look for the "name:" for the start of the next module
 >     parsePackages acc (f:v) | "name: " `isPrefixOf` f =
@@ -75,11 +79,11 @@ configCompiler :: Maybe CompilerFlavor -> Maybe FilePath -> Maybe FilePath -> Pr
 >     -- this works because of the way ghc-pkg pretty prints large fields
 >     parseMoreModules acc nm macc ((' ':f):v) = parseMoreModules acc nm (f:macc) v
 >     parseMoreModules acc nm macc v =
->       let ms = PackageInf nm (words $ unwords macc)
+>       let ms = PackageInfo nm (words $ unwords macc)
 >       in parsePackages (ms:acc) v
 
-> kludgePackages :: [PackageInf] -> [PackageInf]
+> {-kludgePackages :: [PackageInf] -> [PackageInf]
 >     -- lots of modules appear in base, haskell98, haskell2010
 >     -- just use base for now.
 > kludgePackages = filter ((`notElem` ["haskell98"
->                                     ,"haskell2010"]) . piName)
+>                                     ,"haskell2010"]) . piName)-}

@@ -2,7 +2,7 @@
 Used for testing: just dump the parsed installed package list to check
 the ghc-pkg dump parser.
 
-> import Distribution.Pot.Packages
+> import Distribution.Pot.InstalledPackages
 > import Data.List
 > --import Distribution.InstalledPackageInfo
 

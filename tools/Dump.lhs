@@ -1,15 +1,14 @@
 
-Dumps the parsed file and package dependency information for a set of
-files
-
-
-> import Distribution.Pot.Modules
+> import Distribution.Pot.RecursiveGetSources
 > import System.Environment
-> import Data.List
-> --import Text.Groom
+> --import Control.Monad
+> import Text.Groom
+> --import Distribution.Pot.Types
+> import  Distribution.Pot.InstalledPackages
 
 > main :: IO ()
 > main = do
 >   args <- getArgs
->   mis <- modulesInfo args
->   putStrLn $ intercalate "\n\n" $ map ppMI mis
+>   pkgs <- readPackages
+>   recursiveGetSources pkgs args [] >>= putStrLn . groom
+

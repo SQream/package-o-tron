@@ -10,9 +10,9 @@ SRC_DIRS = src tools
 
 # the names of exe files to compile (these need to be the full paths
 # from the Makefile). You have to use ./ prefix if it is in the root folder
-EXE_FILES = tools/MakeHaskellMake tools/Dump tools/DumpPackageDB \
-        tools/ShowPackages tools/CabalLint tools/TextHaskellSourceParser \
-        tools/Dump2
+EXE_FILES = tools/Dump tools/DumpPackageDB \
+        tools/ShowPackages tools/TestHaskellSourceParser \
+        #tools/CabalLint tools/MakeHaskellMake
 
 # folder to put build and exe files in
 BUILD = build

@@ -10,14 +10,22 @@ to output package versions as well
 to exclude system packages
 to collect the tarballs for all these packages
 
-> import Distribution.Pot.Modules
+> import Distribution.Pot.RecursiveGetSources
 > import System.Environment
 > --import Control.Applicative
 > import Data.List
+> import Distribution.Pot.InstalledPackages
+> import Distribution.Pot.DeepDependencies
+> import Distribution.Pot.Types
+> --import qualified Data.Text as T
+> --import Data.Either
+> --import Text.Groom
 
 > main :: IO ()
 > main = do
 >   args <- getArgs
->   mi <- modulesInfo args
->   let ps = sort $ nub $ concatMap miDirectDeepPackages mi
->   putStrLn $ intercalate "\n" ps
+>   pkgs <- readPackages
+>   srcs <- recursiveGetSources pkgs args []
+>   let asrcs = deepDependencies pkgs srcs
+>   putStrLn $ intercalate "\n\n" $ map {-(\x -> groom x
+>                                              ++ -}ppEssi {-x)-} asrcs

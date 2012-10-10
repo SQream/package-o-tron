@@ -13,7 +13,7 @@
 > import Control.Monad
 > --import Data.Attoparsec.Combinator
 > import Control.Applicative
-> import Debug.Trace
+> --import Debug.Trace
 > import Prelude hiding (takeWhile)
 > --import Data.Maybe
 > import System.FilePath
@@ -112,9 +112,10 @@ between the start of the line and the end of the module name
 >                                               ,void $ string "-}"])
 
 > voidTrace :: Show a => String -> Parser a -> Parser ()
-> voidTrace m p = do
->   x <- p
->   trace (m ++ ": " ++ show x) $ return ()
+> voidTrace _m p = do
+>   _x <- p
+>   --trace (m ++ ": " ++ show x) $ return ()
+>   return ()
 
 > {-traceSkipWhile :: String -> (Char -> Bool)
 >                -> Parser ()

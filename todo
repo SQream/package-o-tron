@@ -1,16 +1,13 @@
-1) write better file parser:
-   get the module name if it has one (assume is main otherwise)
-   bail out early
-   deal with block comments over imports
-2) change command line options:
-   --hide-package packagename csv
-   --src-root filename csv
-will then traverse the dependencies in the src-roots to get all the
-   needed local files. Use it by passing your exposed module files,
-   and/or a list of exe files
-deep dependencies: package parser + information in modulesinfo
+do deep dependencies
+fix caballint
+fix makefilemake
+new command line iface:
+-isrc:folders
+--hide-package packagename
+root filenames
+-> for MakeFileMake
 
-then can do
+then
 blessed .tar.gz set generation + run sdist on local packages
 -> pass in the root files as with above
 + pass in a list of folders where local versions of packages are
