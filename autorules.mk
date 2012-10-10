@@ -24,8 +24,11 @@ $(BUILD)/Distribution/Pot/InstalledPackages.o : src/Distribution/Pot/InstalledPa
             $(BUILD)/Distribution/Pot/Types.hi
 	-mkdir -p $(BUILD)/Distribution/Pot/
 	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
+            -package Cabal \
             -package base \
             -package process \
+            -package split \
+            -package text \
             -c $< -o $(BUILD)/Distribution/Pot/InstalledPackages.o \
             -i$(BUILD)/
 
@@ -133,6 +136,7 @@ $(BUILD)/Dump : $(BUILD)/Dump.o \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.o \
             $(BUILD)/Distribution/Pot/Types.o \
             -hide-all-packages \
+            -package Cabal \
             -package attoparsec \
             -package base \
             -package directory \
@@ -140,6 +144,7 @@ $(BUILD)/Dump : $(BUILD)/Dump.o \
             -package groom \
             -package mtl \
             -package process \
+            -package split \
             -package text
 
 $(BUILD)/DumpPackageDB : $(BUILD)/DumpPackageDB.o \
@@ -152,8 +157,10 @@ $(BUILD)/DumpPackageDB : $(BUILD)/DumpPackageDB.o \
             $(BUILD)/Distribution/Pot/InstalledPackages.o \
             $(BUILD)/Distribution/Pot/Types.o \
             -hide-all-packages \
+            -package Cabal \
             -package base \
             -package process \
+            -package split \
             -package text
 
 $(BUILD)/ShowPackages : $(BUILD)/ShowPackages.o \
@@ -172,12 +179,14 @@ $(BUILD)/ShowPackages : $(BUILD)/ShowPackages.o \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.o \
             $(BUILD)/Distribution/Pot/Types.o \
             -hide-all-packages \
+            -package Cabal \
             -package attoparsec \
             -package base \
             -package directory \
             -package filepath \
             -package mtl \
             -package process \
+            -package split \
             -package text
 
 $(BUILD)/TestHaskellSourceParser : $(BUILD)/TestHaskellSourceParser.o \

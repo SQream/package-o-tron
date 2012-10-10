@@ -35,9 +35,9 @@ todo change to text?
 
 > data PackageInfo =
 >     PackageInfo
->     {piName :: String -- ^ the name of the package (hash/ version info stripped)
->     ,piExposedModules :: [String] -- ^ the names of the exposed modules, e.g. A.B.C
->     --,piDependencies :: [String] -- ^ the names of the packages that this package depends on
+>     {piName :: T.Text -- ^ the name of the package (hash/ version info stripped)
+>     ,piExposedModules :: [T.Text] -- ^ the names of the exposed modules, e.g. A.B.C
+>     ,piDependencies :: [T.Text] -- ^ the names of the packages that this package depends on
 >     } deriving (Eq,Show)
 
 > splitDep :: ImportInfo -> Either FilePath T.Text

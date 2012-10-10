@@ -79,8 +79,7 @@ also check the package list
 > annotate pkgs roots fp ssi = do
 >   iis <- forM (ssiImports ssi) $ \ip -> do
 >            -- get the matching packages
->            let ims = map (ImportFromPackage . T.pack)
->                      $ lookupPackageForModule pkgs $ T.unpack ip
+>            let ims = map ImportFromPackage $ lookupPackageForModule pkgs ip
 >            lfs <- afs ip
 >            return (ip,sort $ nub $ lfs ++ ims)
 
