@@ -10,7 +10,7 @@ the local fileset, and modules which aren't (the local module
 dependencies can be used for a build tool, and the non-local ones for
 determining which packages are referenced)
 
-> {-# LANGUAGE TupleSections,ScopedTypeVariables #-}
+> {-# LANGUAGE TupleSections,ScopedTypeVariables,PatternGuards #-}
 > module Distribution.Pot.Modules
 >     (ModuleInfo(..)
 >     ,modulesInfo
@@ -33,16 +33,20 @@ determining which packages are referenced)
 Rough code to parse out all the imports from a haskell source. Not
 robust but I think should work on normal haskell source files.
 
+todo: cope with block commented out imports
+
 > parseImports :: String -> [String]
 > parseImports src = nub $ mapMaybe (im . words) $ lines src
 >   where
 >     im (">":x:_) | x /= "import" = Nothing
->     im (">":"import":"qualified":nm:_) = Just nm
->     im (">":"import":nm:_) = Just nm
+>     im (">":"import":"qualified":nm:_) = Just $ fixNm nm
+>     im (">":"import":nm:_) = Just $ fixNm nm
 >     im (x:_) | x /= "import" = Nothing
->     im ("import":"qualified":nm:_) = Just nm
->     im ("import":nm:_) = Just nm
+>     im ("import":"qualified":nm:_) = Just $ fixNm nm
+>     im ("import":nm:_) = Just $ fixNm nm
 >     im _ = Nothing
+>     -- for case e.g. import Data.Maybe(...)
+>     fixNm = takeWhile (/='(')
 
 reads the folders passed in as source roots and returns a list of all
 the modules (returning the root prefix folder (which is a elem of the
@@ -162,17 +166,17 @@ and the direct package information is filled in from the non localdeps
 >     fixDirectDeps :: [(String,(FilePath,FilePath))] -> [PackageInf] -> ModuleInfo -> ModuleInfo
 >     fixDirectDeps localModuleFilenames pkgs mi =
 >         let (localDeps,packageDeps) = partitionEithers
->                                       $ map (lookupModule localModuleFilenames pkgs . snd)
+>                                       $ map (lookupModule mi localModuleFilenames pkgs . snd)
 >                                       $ miLocalDeps mi
 >         in mi {miLocalDeps = nub localDeps
 >               ,miDirectPackages = sort $ nub $ concat packageDeps
 >               ,miPackageImports = sort $ nub (map snd $ miLocalDeps mi) \\ nub (map snd $ localDeps)}
->     lookupModule localModuleFilenames pkgs mn =
+>     lookupModule mi localModuleFilenames pkgs mn =
 >         case () of
 >             _ | Just finf <- lookup mn localModuleFilenames -> Left (finf,mn)
 >               | otherwise ->
 >                     case lookupPackageForModule pkgs mn of
->                         [] -> error $ "module not found: " ++ mn
+>                         [] -> error $ miModuleName mi ++ ": module not found: " ++ mn
 
 if there is more than one package match, just add all the matching
 packages, this could be wrong at the moment I've seen this with

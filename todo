@@ -1,16 +1,57 @@
-clean up command line options for makefile stuff
-and for other things
+1) write better file parser:
+   get the module name if it has one (assume is main otherwise)
+   bail out early
+   deal with block comments over imports
+2) change command line options:
+   --hide-package packagename csv
+   --src-root filename csv
+will then traverse the dependencies in the src-roots to get all the
+   needed local files. Use it by passing your exposed module files,
+   and/or a list of exe files
+deep dependencies: package parser + information in modulesinfo
 
-blessed .tar.gz set generation
+then can do
+blessed .tar.gz set generation + run sdist on local packages
+-> pass in the root files as with above
++ pass in a list of folders where local versions of packages are
+will find all the package dependencies
+get rid of the ones which come with ghc
+get all the .tar.gz from $CABAL_HOME for these packages
+override or supply .tar.gz from local folders -> so if a package isn't
+   in $CABAL_HOME at all, but one of the folders has a .cabal with
+   that name, use cabal sdist to create the .tar.gz to use
+   if the package is both in one of the folders and in $CABAL_HOME,
+   then use the folder one as an override (emit a warning)
+   if there are multiple folders with the same needed package, error
+report any missing packages, but succeed with what is available
+
+
+
+clean up command line options for makefile stuff and for other things
+  follow roots, exes automatic, module names
+deal with block comments better
+refactor, esp. moduleinfo
+deep package dependencies
+
+check installed: dups, not latest
+check stuff on cabal install --dry-run
+
+
+
+check cabal --dry-run for dups/ not latest version:
+cabal already reports reinstall and new version, highlight these a lot
+   better and add highlight for versions which aren't the latest
+
+package database checker: dup versions, non latest versions
 
 lint: duplicate listing, unreferenced files, extensions, benchmark
    sections
 refactor and document the lint, makefiler and lib modules
 fix the dump exes
 
-check cabal --dry-run for dups/ not latest version
-
-package database checker: dup versions, non latest versions
+upgrade all: try to unregister then reinstall all cabal packages in
+   latest version, or take all packages from one sandbox and install
+   latest in another sandbox for testing
 
 ...
 

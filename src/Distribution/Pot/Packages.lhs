@@ -18,6 +18,7 @@ not sure if this information is available in Cabal or something
 > import Data.List
 > import System.Process
 > --import Text.Groom
+> import Distribution.Pot.Types
 
 
 > --import Distribution.Simple.Configure
@@ -46,12 +47,6 @@ configCompiler :: Maybe CompilerFlavor -> Maybe FilePath -> Maybe FilePath -> Pr
 >                                defaultProgramConfiguration
 >   return $ allPackages pinf-}
 
-> data PackageInf =
->     PackageInf
->     {piName :: String -- ^ the name of the package (hash/ version info stripped)
->     ,piExposedModules :: [String] -- ^ the names of the exposed modules, e.g. A.B.C
->     --,piDependencies :: [String]
->     } deriving Show
 
 > lookupPackageForModule :: [PackageInf] -> String -> [String]
 > lookupPackageForModule pkgs m = do

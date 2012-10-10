@@ -25,6 +25,14 @@ if you specify all the source files, it could work out which ones are
   mains automatically
 maybe do as csv as well e.g. so can do --source-root=a,b,c
 
+if you get a project, and you are missing a bunch of the packages
+needed, you can run make and it will tell you the missing packages
+drip by drip. if it is quick, have it check all the packages needed
+for a target automatically and report them all before trying to
+compile, or if this check is slow, add a new makefile target which
+will report all the files and which set of packages they need and
+which of these packages are missing in one go
+
 work on robustness:
 what if a file is missing
 can't be parsed
@@ -41,6 +49,16 @@ want to be able to emit a warning and muddle through when this happens
 
 support two stage .o, .dyn_o to get creation of .so with source that
 uses template haskell
+
+situation: you have some new module code written, you want to run make
+autorules, but there is a syntax error which stops the autorules from
+building. The error messages from here are a bit crap. ?solution: if
+this file can't parse a source, maybe try and parse it with ghc to get
+better syntax errors before the autorules can be built.
+
+
+what happens when it finds an import which it can't track down, want a
+good error message in this case also for same reason
 
 > import Distribution.Pot.Modules
 > import Data.List
