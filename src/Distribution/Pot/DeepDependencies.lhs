@@ -4,20 +4,9 @@
 > module Distribution.Pot.DeepDependencies where
 
 > import Distribution.Pot.Types
-> --import Distribution.Pot.HaskellSourceParser
-
-> --import qualified Data.Text as T
-> --import qualified Data.Text.Lazy.IO as LT
-> --import System.FilePath
-> --import Control.Monad
 > import Data.List
-> --import Distribution.Pot.InstalledPackages
-> --import Control.Monad.State
-> --import Control.Applicative
 > import Data.Maybe
-> --import System.Directory
 > import Data.Either
-> --import Control.Arrow
 
 creates the deep dependencies for each entry
 todo: use state monad to avoid repeated tree traversals
@@ -36,5 +25,12 @@ todo: use state monad to avoid repeated tree traversals
 >          let deepImps = sort $ nub $ transitiveImports assi
 >              deepPks = rights $ concatMap (map splitDep . snd) deepImps
 >          in DSSI {dssiAssi = assi
+>                   -- these are all the direct package dependencies of
+>                   -- the file and all its local dependency sources
+>                   -- the list of packages to pass to ghc when linking
 >                  ,dssiDeepImports = deepImps
+>                   -- these are all the above packages plus all their dependencies
+>                   -- take this list, remove the packages that come with ghc
+>                   -- now you have exactly all the packages you need to download
+>                   -- on a fresh sandbox/system to compile the source code
 >                  ,dssiDeepDeepPackages = sort $ nub $ concatMap allPackDeps $ deepPks}

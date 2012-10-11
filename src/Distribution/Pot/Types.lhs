@@ -5,6 +5,7 @@
 > import Data.Either
 > import Data.List
 > import Control.Arrow
+> import Data.Maybe
 
 > -- | represents the information parsed from a haskell source file
 > data SourceSyntaxInfo =
@@ -23,6 +24,13 @@
 >     ,assiModuleName :: Maybe T.Text
 >     ,assiImports :: [(T.Text,[ImportInfo])] -- ^ list of possible places the import can point to (so ambiguities with more than one source file and/or more than one package represented here)
 >     } deriving (Eq,Show)
+
+> packageDeps :: AnnotatedSSI -> [T.Text]
+> packageDeps = mapMaybe (\x -> case x of
+>                                 ImportFromPackage p -> Just p
+>                                 _ -> Nothing)
+>               . concatMap snd
+>               . assiImports
 
 > data DeepSSI =
 >     DSSI

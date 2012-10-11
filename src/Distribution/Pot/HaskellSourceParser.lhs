@@ -11,11 +11,8 @@
 > import qualified Data.Text as T
 > import Data.Char
 > import Control.Monad
-> --import Data.Attoparsec.Combinator
 > import Control.Applicative
-> --import Debug.Trace
 > import Prelude hiding (takeWhile)
-> --import Data.Maybe
 > import System.FilePath
 > import Distribution.Pot.Types
 
@@ -26,7 +23,7 @@ imports from a haskell file
 features:
 does normal .hs and .lhs birdfeet style
 deals with block comments
-stops parsing early
+stops parsing early when it has the info it needs
 
 > filterBirdfeet :: LT.Text -> LT.Text
 > filterBirdfeet = LT.unlines
@@ -52,7 +49,7 @@ stops parsing early
 >   mn <- option Nothing (Just <$> modulep)
 >   is <- many importp
 >   return SSI {ssiModuleName = mn
->              ,ssiImports = is}
+>              ,ssiImports = "Prelude" : is}
 
 assume there are no block comments on a module or import line
 between the start of the line and the end of the module name
@@ -77,7 +74,10 @@ between the start of the line and the end of the module name
 >     return mn
 
 > dottedIden :: Parser T.Text
-> dottedIden = takeWhile1 (\x -> isAlpha x || x == '.')
+> dottedIden = do
+>   x <- satisfy isAlpha
+>   y <- takeWhile (\x -> isAlphaNum x || x == '.')
+>   return $ T.cons x y
 
 > -- skip any whitespace except newline
 > sws :: Parser ()
@@ -107,9 +107,12 @@ between the start of the line and the end of the module name
 > blockComment :: Parser ()
 > blockComment = do
 >     void $ string "{-"
->     -- nested commented not working, not sure why
->     voidTrace "bc" $ manyTill anyChar (choice [blockComment
->                                               ,void $ string "-}"])
+>     let suffix :: Parser ()
+>         suffix = void $ manyTill anyChar (choice [do
+>                                                   blockComment
+>                                                   suffix
+>                                                  ,void $ string "-}"])
+>     suffix
 
 > voidTrace :: Show a => String -> Parser a -> Parser ()
 > voidTrace _m p = do

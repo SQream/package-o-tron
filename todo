@@ -1,19 +1,8 @@
-do deep dependencies
-fix caballint
-fix makefilemake
-new command line iface:
--isrc:folders
---hide-package packagename
-root filenames
--> for MakeFileMake
+flag unrecognised imports and ambiguous imports in caballint,
+   makehaskellmake, etc.
 
-then
-blessed .tar.gz set generation + run sdist on local packages
--> pass in the root files as with above
-+ pass in a list of folders where local versions of packages are
-will find all the package dependencies
-get rid of the ones which come with ghc
-get all the .tar.gz from $CABAL_HOME for these packages
+fix caballint for exes depending on the package
+
 override or supply .tar.gz from local folders -> so if a package isn't
    in $CABAL_HOME at all, but one of the folders has a .cabal with
    that name, use cabal sdist to create the .tar.gz to use
@@ -21,18 +10,6 @@ override or supply .tar.gz from local folders -> so if a package isn't
    then use the folder one as an override (emit a warning)
    if there are multiple folders with the same needed package, error
 report any missing packages, but succeed with what is available
-
-
-
-clean up command line options for makefile stuff and for other things
-  follow roots, exes automatic, module names
-deal with block comments better
-refactor, esp. moduleinfo
-deep package dependencies
-
-check installed: dups, not latest
-check stuff on cabal install --dry-run
-
 
 
 check cabal --dry-run for dups/ not latest version:
@@ -48,7 +25,10 @@ fix the dump exes
 
 upgrade all: try to unregister then reinstall all cabal packages in
    latest version, or take all packages from one sandbox and install
-   latest in another sandbox for testing
+   latest versions of same packages in another sandbox for testing
+
+
+test makefilemake and caballint on a bunch of packages from hackage
 
 ...
 
@@ -63,8 +43,5 @@ tester: use sandboxing to:
     check it works with all the earliest "
 
 third party package hacker
-
-test the caballint on all the packages in hackage?
-+ test other exes in this way
 
 produce a big dependency diagram showing modules and packages

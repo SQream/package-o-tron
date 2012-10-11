@@ -5,7 +5,6 @@
 > import Distribution.Pot.HaskellSourceParser
 > import Distribution.Pot.Types
 
-> --import qualified Data.Text.Lazy as LT
 > import qualified Data.Text as T
 > import qualified Data.Text.Lazy.IO as LT
 > import System.FilePath
@@ -33,7 +32,7 @@ source and one or more packages match, emit warning and use local
 source only, and if two local sources match only then error?
 
 > recursiveGetSources :: [PackageInfo] -> [FilePath] -> [FilePath] -> IO [AnnotatedSSI]
-> recursiveGetSources pkgs rootSources additionalRoots = do
+> recursiveGetSources pkgs rootSources rootFolders = do
 >   -- read and parse the root sources
 >   rs <- forM rootSources $ \fn -> do
 >           f <- LT.readFile fn
@@ -48,16 +47,8 @@ source only, and if two local sources match only then error?
 >                                     else error $ "module name doesn't match filename:\n"
 >                                                  ++ T.unpack m ++ "\n" ++ fn ++ "\n" ++ mfn
 >           return (fn,(root,i))
->   -- combine the roots from these with the additional roots
->   -- maybe should just use something like -i instead of doing this automatically
->   let allRoots = sort $ nub $
->                  additionalRoots
->                  ++ map (\x -> case fst $ snd x of
->                               "" -> "."
->                               y -> y) rs
->   putStrLn $ show allRoots
 >   -- run the recursion
->   execStateT (mapM (uncurry $ annotate pkgs allRoots)
+>   execStateT (mapM (uncurry $ annotate pkgs rootFolders)
 >                     $ map (\(fn,(_,i)) -> (fn,i)) rs) []
 
 > moduleNameToFileName :: T.Text -> FilePath
@@ -82,10 +73,9 @@ also check the package list
 >            let ims = map ImportFromPackage $ lookupPackageForModule pkgs ip
 >            lfs <- afs ip
 >            return (ip,sort $ nub $ lfs ++ ims)
-
 >   let a = ASSI {assiFilename = fp
 >                ,assiModuleName = ssiModuleName ssi
->                ,assiImports = sort $ nub $ iis}
+>                ,assiImports = sort $ nub iis}
 >   modify (a:)
 >   return ()
 >   where

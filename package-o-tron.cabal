@@ -30,25 +30,29 @@ source-repository head
   location: https://github.com/JakeWheat/package-o-tron.git
 
 library
-  exposed-modules:  Distribution.Pot.Packages, Distribution.Pot.Modules
+  exposed-modules:  Distribution.Pot.DeepDependencies,
+                    Distribution.Pot.InstalledPackages,
+                    Distribution.Pot.RecursiveGetSources,
+                    Distribution.Pot.Types
+  other-modules:    Distribution.Pot.HaskellSourceParser
   build-depends:    base >= 4 && < 5,
-                    process,filepath,filemanip
+                    process,filepath,text,Cabal,split,directory,mtl,attoparsec
   hs-source-dirs:   src
 
 executable MakeHaskellMake
   build-depends:    base >= 4 && < 5,
-                    filepath,process,filemanip,time,package-o-tron
+                    filepath,time,package-o-tron,text,split
   main-is:          MakeHaskellMake.lhs
   hs-source-dirs:   tools
 
 executable CabalLint
   build-depends:    base >= 4 && < 5,
-                    filepath,process,filemanip,Cabal,packdeps,package-o-tron
+                    filepath,Cabal,packdeps,package-o-tron,directory,text
   main-is:          CabalLint.lhs
   hs-source-dirs:   tools
 
-executable ShowPackages
+executable SavePackages
   build-depends:    base >= 4 && < 5,
-                    filepath,process,filemanip,package-o-tron
-  main-is:          ShowPackages.lhs
+                    filepath,filemanip,package-o-tron,directory,split,text
+  main-is:          SavePackages.lhs
   hs-source-dirs:   tools

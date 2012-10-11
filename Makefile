@@ -10,9 +10,13 @@ SRC_DIRS = src tools
 
 # the names of exe files to compile (these need to be the full paths
 # from the Makefile). You have to use ./ prefix if it is in the root folder
-EXE_FILES = tools/Dump tools/DumpPackageDB \
-        tools/ShowPackages tools/TestHaskellSourceParser \
-        #tools/CabalLint tools/MakeHaskellMake
+EXE_FILES = tools/SummarizeSources \
+         tools/TestHaskellSourceParser \
+         tools/SavePackages \
+         tools/MakeHaskellMake \
+         tools/CabalLint
+
+EXE_FILENAMES = $(addsuffix ".lhs",$(EXE_FILES))
 
 # folder to put build and exe files in
 BUILD = build
@@ -51,7 +55,7 @@ all : $(EXE_FILES_TARGETS)
 # use cabal configure && cabal build to make the exes
 .PHONY : autorules
 autorules :
-	MakeHaskellMake package-o-tron FLDS $(SRC_DIRS) EXES $(EXE_FILES) > \
+	MakeHaskellMake --hide-package package-o-tron --hide-package haskell98 --hide-package haskell2010 $(HC_INCLUDE_DIRS) $(EXE_FILENAMES) > \
             autorules.mk
 
 .PHONY : clean

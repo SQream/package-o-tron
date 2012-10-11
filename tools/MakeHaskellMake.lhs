@@ -1,11 +1,6 @@
 Example of calling this file:
 
-MakeHaskellMake package-o-tron FLDS . exe-src EXES exe-src/Makefilerize exe-src/ShowPackages exe-src/CabalLint
-
-write the packages to ignore first the the text 'FLDS'
-then write the folders which source appears in (same folders you would
-pass to -i with ghc) then the text 'EXES'
-write the paths to the exes
+MakeHaskellMake --hide-package package-o-tron --hide-package haskell2010 --hide-package haskell98 -isrc:tools tools/*.lhs
 
 It will generate rules to compile all the .o files and link the exes,
 with explicit package lists.
@@ -14,16 +9,6 @@ See the included Makefile, autorules.mk file for an example of how to
 use this, and an example of what is output.
 
 TODO:
-
-fix the interface:
---hide-package nm (multiple)
---source-root dir (multiple)
---source-file filepath (multiple)
-so you have to specify the roots plus the source files?
-or it could work out the roots automatically?
-if you specify all the source files, it could work out which ones are
-  mains automatically
-maybe do as csv as well e.g. so can do --source-root=a,b,c
 
 if you get a project, and you are missing a bunch of the packages
 needed, you can run make and it will tell you the missing packages
@@ -60,48 +45,80 @@ better syntax errors before the autorules can be built.
 what happens when it finds an import which it can't track down, want a
 good error message in this case also for same reason
 
-> import Distribution.Pot.Modules
+> {-# LANGUAGE OverloadedStrings,TupleSections #-}
+> --import Distribution.Pot.Modules
 > import Data.List
 > import System.FilePath
 > import System.Environment
 > import Control.Arrow
 > import Data.Char
-> import Data.Maybe
+> --import Data.Maybe
 > import Data.Time.Clock
 > import Data.Time.Calendar
+> import Distribution.Pot.Types
+> import Distribution.Pot.RecursiveGetSources
+> --import System.Environment
+> --import Control.Monad
+> --import Text.Groom
+> --import Distribution.Pot.Types
+> import Distribution.Pot.InstalledPackages
+> import Distribution.Pot.DeepDependencies
+> --import Data.List
+> import Data.List.Split
+> import qualified Data.Text as T
+> import Data.Either
+> import Debug.Trace
 
 generate a makefile entry to compile a .lhs or .hs to .o and .hi
 explicitly lists all the immediate .hi dependencies and package
   dependencies
 specifies the -o explicitly since ghc outputs modules with a main as
   Main.o instead of their proper name (maybe this is a ghc bug?)
+  -> it only does this when you use an outputdir
 
-> moduleCompile :: ModuleInfo -> String
-> moduleCompile mi =
->   objOf mi
->   ++ " : " ++ intercalate nl (miModuleFile mi : map (fhiOf . fst) (miLocalDeps mi))
->   ++ "\n\t-mkdir -p " ++ dropFileName (objOf mi)
->   ++ "\n\t$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ "
->   ++ nl ++ intercalate nl (map ("-package " ++) $ addBase $ miDirectPackages mi)
->   ++ nl ++ "-c $< -o " ++ objOf mi
->   ++ nl ++ "-i$(BUILD)/"
+> data CompileModule =
+>     CompileModule
+>     {cmObjName :: FilePath
+>     ,cmDependencies :: [FilePath]
+>     ,cmPackages :: [T.Text]}
+
+> compileModule :: [T.Text] -> DeepSSI -> CompileModule
+> compileModule hidePacks dssi =
+>     let (modDeps,packDeps) = partitionEithers $
+>                              concatMap(\(n,i) -> map (either (Left . (n,)) (Right . (n,)))
+>                                                  $ map splitDep i)
+>                              $ assiImports $ dssiAssi dssi
+>         pds = (sort $ nub $ map snd packDeps) \\ hidePacks
+>         assi = dssiAssi dssi
+>     in CompileModule (objOf (assiModuleName assi, assiFilename assi))
+>                      ((assiFilename $ dssiAssi dssi)
+>                       : map hiOf (map (first Just) modDeps))
+>                      pds
+
+> fOf :: String -> (Maybe T.Text,FilePath) -> FilePath
+> fOf e (Nothing,fp) = ("$(BUILD)" </>) . (`addExtension` e) . takeBaseName $ fp
+> fOf e (Just m, _fp) = ("$(BUILD)" </>) . (`addExtension` e) . mfn $ T.unpack m
+>     where
+>       mfn = map (\c -> case c of
+>                               '.' -> '/'
+>                               _ -> c)
+> hiOf,objOf :: (Maybe T.Text,FilePath) -> FilePath
+> hiOf = fOf "hi"
+> objOf = fOf "o"
+
+
+> ppCM :: CompileModule -> String
+> ppCM cm =
+>     cmObjName cm ++ " : "
+>     ++ intercalate nl (cmDependencies cm)
+>     ++ "\n\t-mkdir -p " ++ dropFileName (cmObjName cm)
+>     ++ "\n\t$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ "
+>     ++ nl ++ intercalate nl (map ("-package " ++) $ (map T.unpack $ cmPackages cm))
+>     ++ nl ++ "-c $< -o " ++ cmObjName cm
+>     ++ nl ++ "-i$(BUILD)/"
 
 > nl :: String
 > nl = " \\\n            "
-
-
-> objOf :: ModuleInfo -> FilePath
-> objOf = ("$(BUILD)/" ++) . flip replaceExtension "o" . miFilename
-> fobjOf :: (FilePath,FilePath) -> FilePath
-> fobjOf = ("$(BUILD)/" ++) . flip replaceExtension "o" . snd
-> fhiOf :: (FilePath,FilePath) -> FilePath
-> fhiOf = ("$(BUILD)/" ++) . flip replaceExtension "hi" . snd
-> exeOf :: ModuleInfo -> FilePath
-> exeOf = ("$(BUILD)/" ++) . takeFileName . dropExtension . miFilename
-
-> addBase :: [String] -> [String]
-> addBase x | "base" `elem` x = x
-> addBase x = "base" : x
 
 create the makefile entry to link a exe:
 lists all the .o files needed in the link (doesn't use ghc --make),
@@ -109,20 +126,42 @@ and all the packages explicitly
 
 TODO: try to split the lines a little less frequently
 
-> exeLink :: ModuleInfo -> String
-> exeLink mi =
->   exeOf mi ++ " : "
->   ++ intercalate nl (objOf mi : map (fobjOf . fst) (miLocalDeepDeps mi))
+> data ExeLink =
+>     ExeLink
+>     {elExeName :: FilePath
+>     ,elMangledExeName :: String
+>     ,elObjects :: [FilePath]
+>     ,elPackages :: [T.Text]}
+
+> ppEL :: ExeLink -> String
+> ppEL el =
+>   elExeName el ++ " : "
+>   ++ intercalate nl (elObjects el)
 >   ++ "\n\t-mkdir -p $(BUILD)/"
->   ++ "\n\t$(HL) $(HL_OPTS) $(" ++ mangledExeName (miModuleFile mi)
+>   ++ "\n\t$(HL) $(HL_OPTS) $(" ++ elMangledExeName el
 >   ++ ") \\\n            "
 >   ++ intercalate nl
->      (["-o " ++ exeOf mi, objOf mi]
->       ++ map (fobjOf . fst) (miLocalDeepDeps mi)
->       ++ ["-hide-all-packages"]
->       ++ map ("-package " ++) (addBase $ miDirectDeepPackages mi))
->   where
->     mangledExeName = (++ "_EXTRA")
+>      (["-o " ++ elExeName el]
+>       ++ elObjects el
+>       ++ map ("-package " ++) (map T.unpack $ elPackages el))
+
+> exeLink :: [T.Text] -> DeepSSI -> ExeLink
+> exeLink hidePacks dssi =
+>     let exeName = takeBaseName $ assiFilename $ dssiAssi dssi
+>         (modDeps,packDeps) = partitionEithers $
+>                              concatMap(\(n,i) -> map (either (Left . (n,)) (Right . (n,)))
+>                                                  $ map splitDep i)
+>                              $ dssiDeepImports dssi
+>         pds = (sort $ nub $ map snd packDeps) \\ hidePacks
+>         assi = dssiAssi dssi
+
+>     in ExeLink {elExeName = "$(BUILD)" </> exeName
+>                ,elMangledExeName = mangledExeName exeName
+>                ,elObjects = objOf (assiModuleName assi, assiFilename assi)
+>                             : map objOf (map (first Just) modDeps)
+>                ,elPackages = pds}
+>     where
+>         mangledExeName = (++ "_EXTRA")
 >                      . map toUpper
 >                      . map (\c -> case c of
 >                                       '/' -> '_'
@@ -130,25 +169,48 @@ TODO: try to split the lines a little less frequently
 >                      . takeFileName
 >                      . dropExtension
 
+
+> data Opts =
+>     Opts
+>     {srcFolders :: [FilePath]
+>     ,hidePackages :: [T.Text]
+>     ,roots :: [FilePath]
+>     } deriving Show
+
+> parseArgs :: [String] -> Opts
+> parseArgs s = do
+>   f [] [] [] s
+>   where
+>     f is ps rs (x:xs) | "-i" `isPrefixOf` x =
+>         let is' = splitOn ":" $ drop 2 x
+>         in f (is ++ is') ps rs xs
+>     f is ps rs ("--hide-package":p:xs) =
+>         f is (p:ps) rs xs
+>     f  _is _ps _rs (["--hide-package"]) =
+>         error $ "no package name after --hide-package"
+>     f is ps rs (x:xs) =
+>         f is ps (x:rs) xs
+>     f is ps rs [] =
+>         Opts is (map T.pack ps) rs
+
+
 > main :: IO ()
 > main = do
->   args <- getArgs
->   let (hidepacks,args') = second (drop 1) $ break (=="FLDS") args
->       (modules,exes) = second (drop 1) $ break (=="EXES") args'
->   mis <- map (hidePackage hidepacks) `fmap` modulesInfo modules
+>   opts <-parseArgs `fmap` getArgs
+>   pkgs <- readPackages
+>   let srcfs = if null (srcFolders opts)
+>               then ["."]
+>               else srcFolders opts
+>   -- parse all the sources
+>   as <- recursiveGetSources pkgs (roots opts) srcfs
+>   let asd = deepDependencies pkgs as
+>   -- write small note
 >   (y,m,d) <- getCurrentTime >>= return . toGregorian . utctDay
 >   putStrLn $ "# Autogenerated on " ++ show y ++ "/" ++ show m ++ "/" ++ show d ++ "\n\
 >              \# http://hackage.haskell.org/package/package-o-tron\n"
->   putStrLn $ intercalate "\n\n" $ map moduleCompile mis
->   let exeMis = map exeMi exes
->       exeMi exe = fromMaybe
->                   (error $ "source file for exe not found: " ++ show exe
->                    ++ " in\n"
->                    ++ intercalate "\n" (map (dropExtension . miModuleFile) mis))
->                   $ find ((== exe) . dropExtension . miModuleFile) mis
->   putStrLn $ intercalate "\n\n" $ map exeLink exeMis
+>   -- write the compiles
+>   putStrLn $ intercalate "\n\n" $ map (ppCM . compileModule (hidePackages opts)) asd
+>   -- write the links
+>   let exes = filter ((`elem` [Just "Main", Nothing]) . assiModuleName . dssiAssi) asd
+>   putStrLn $ intercalate "\n\n" $ map (ppEL . exeLink (hidePackages opts)) exes
 >   putStrLn "\n\n%.hi : %.o\n\t@:"
->   where
->     hidePackage ps m = m {miDirectPackages = filter (`notElem` ps) $ miDirectPackages m
->                          ,miDirectDeepPackages = filter (`notElem` ps) $ miDirectDeepPackages m}
-

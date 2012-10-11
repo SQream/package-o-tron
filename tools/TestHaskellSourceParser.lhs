@@ -4,11 +4,15 @@
 
 > import qualified Data.Text.Lazy.IO as T
 > import Text.Groom
-> import System.Environment
-> {- first  {- ini -} middle
->   import qualified Data.Text.Lazy as T
->   end -}
+
+test the haskell source parser for nested block comments
+
+> {- first  {- nested -} middle
+> import qualified Data.Text.Lazy as T
+> end -}
 > --import System.FilePath
+
+> import System.Environment
 
 > main :: IO ()
 > main = do
