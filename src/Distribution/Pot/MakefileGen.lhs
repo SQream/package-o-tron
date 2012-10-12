@@ -67,7 +67,8 @@ specifies the -o explicitly since ghc outputs modules with a main as
 > -- | information needed to compile a module to .o
 > data CompileModule =
 >     CompileModule
->     {cmObjName :: FilePath -- ^ the .o file for the module
+>     {cmHsName :: FilePath -- ^ the .hs/.lhs file for the module
+>     ,cmObjName :: FilePath -- ^ the .o file for the module
 >     ,cmDependencies :: [FilePath] -- ^ the dependencies (.lhs and the .hi of the local imports)
 >     ,cmPackages :: [T.Text] -- ^ the packages needed to compile this module
 >     }
@@ -79,7 +80,8 @@ specifies the -o explicitly since ghc outputs modules with a main as
 >                              $ sdImports $ ddSd dssi
 >         pds = sort (nub $ map snd packDeps) \\ hidePacks
 >         assi = ddSd dssi
->     in CompileModule (objOf (sdModuleName assi, sdFilename assi))
+>     in CompileModule (sdFilename assi)
+>                      (objOf (sdModuleName assi, sdFilename assi))
 >                      (sdFilename (ddSd dssi)
 >                       : map (hiOf . first Just) modDeps)
 >                      pds
@@ -103,7 +105,8 @@ specifies the -o explicitly since ghc outputs modules with a main as
 >     ++ "\n\t-mkdir -p " ++ dropFileName (cmObjName cm)
 >     ++ "\n\t$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ "
 >     ++ nl ++ intercalate nl (map (("-package " ++) . T.unpack) $ cmPackages cm)
->     ++ nl ++ "-c $< -o " ++ cmObjName cm
+>     ++ nl ++ "-c " ++ cmHsName cm
+>     ++ nl ++ "-o " ++ cmObjName cm
 >     ++ nl ++ "-i$(BUILD)/"
 
 > nl :: String

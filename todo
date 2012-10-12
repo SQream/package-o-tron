@@ -2,6 +2,9 @@
 
 turn savepackages into library modules
    with commandline front ends
+move the pretty print of cabal lint exe to library
+
+tidy up the makefile output
 
 cabal lint examples:
 run on package-o-tron

@@ -9,7 +9,8 @@ $(BUILD)/SummarizeSources.o : tools/SummarizeSources.lhs \
             -package base \
             -package groom \
             -package split \
-            -c $< -o $(BUILD)/SummarizeSources.o \
+            -c tools/SummarizeSources.lhs \
+            -o $(BUILD)/SummarizeSources.o \
             -i$(BUILD)/
 
 $(BUILD)/TestHaskellSourceParser.o : tools/TestHaskellSourceParser.lhs \
@@ -19,7 +20,8 @@ $(BUILD)/TestHaskellSourceParser.o : tools/TestHaskellSourceParser.lhs \
             -package base \
             -package groom \
             -package text \
-            -c $< -o $(BUILD)/TestHaskellSourceParser.o \
+            -c tools/TestHaskellSourceParser.lhs \
+            -o $(BUILD)/TestHaskellSourceParser.o \
             -i$(BUILD)/
 
 $(BUILD)/SavePackages.o : tools/SavePackages.lhs \
@@ -36,7 +38,8 @@ $(BUILD)/SavePackages.o : tools/SavePackages.lhs \
             -package process \
             -package split \
             -package text \
-            -c $< -o $(BUILD)/SavePackages.o \
+            -c tools/SavePackages.lhs \
+            -o $(BUILD)/SavePackages.o \
             -i$(BUILD)/
 
 $(BUILD)/MakeHaskellMake.o : tools/MakeHaskellMake.lhs \
@@ -47,7 +50,8 @@ $(BUILD)/MakeHaskellMake.o : tools/MakeHaskellMake.lhs \
             -package split \
             -package text \
             -package time \
-            -c $< -o $(BUILD)/MakeHaskellMake.o \
+            -c tools/MakeHaskellMake.lhs \
+            -o $(BUILD)/MakeHaskellMake.o \
             -i$(BUILD)/
 
 $(BUILD)/Distribution/Pot/MakefileGen.o : src/Distribution/Pot/MakefileGen.lhs \
@@ -60,7 +64,8 @@ $(BUILD)/Distribution/Pot/MakefileGen.o : src/Distribution/Pot/MakefileGen.lhs \
             -package base \
             -package filepath \
             -package text \
-            -c $< -o $(BUILD)/Distribution/Pot/MakefileGen.o \
+            -c src/Distribution/Pot/MakefileGen.lhs \
+            -o $(BUILD)/Distribution/Pot/MakefileGen.o \
             -i$(BUILD)/
 
 $(BUILD)/CabalLint.o : tools/CabalLint.lhs \
@@ -69,7 +74,8 @@ $(BUILD)/CabalLint.o : tools/CabalLint.lhs \
 	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
             -package base \
             -package text \
-            -c $< -o $(BUILD)/CabalLint.o \
+            -c tools/CabalLint.lhs \
+            -o $(BUILD)/CabalLint.o \
             -i$(BUILD)/
 
 $(BUILD)/Distribution/Pot/CabalLint.o : src/Distribution/Pot/CabalLint.lhs \
@@ -85,7 +91,8 @@ $(BUILD)/Distribution/Pot/CabalLint.o : src/Distribution/Pot/CabalLint.lhs \
             -package filepath \
             -package packdeps \
             -package text \
-            -c $< -o $(BUILD)/Distribution/Pot/CabalLint.o \
+            -c src/Distribution/Pot/CabalLint.lhs \
+            -o $(BUILD)/Distribution/Pot/CabalLint.o \
             -i$(BUILD)/
 
 $(BUILD)/Distribution/Pot/DeepDependencies.o : src/Distribution/Pot/DeepDependencies.lhs \
@@ -93,7 +100,8 @@ $(BUILD)/Distribution/Pot/DeepDependencies.o : src/Distribution/Pot/DeepDependen
 	-mkdir -p $(BUILD)/Distribution/Pot/
 	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
             -package base \
-            -c $< -o $(BUILD)/Distribution/Pot/DeepDependencies.o \
+            -c src/Distribution/Pot/DeepDependencies.lhs \
+            -o $(BUILD)/Distribution/Pot/DeepDependencies.o \
             -i$(BUILD)/
 
 $(BUILD)/Distribution/Pot/RecursiveGetSources.o : src/Distribution/Pot/RecursiveGetSources.lhs \
@@ -107,7 +115,8 @@ $(BUILD)/Distribution/Pot/RecursiveGetSources.o : src/Distribution/Pot/Recursive
             -package filepath \
             -package mtl \
             -package text \
-            -c $< -o $(BUILD)/Distribution/Pot/RecursiveGetSources.o \
+            -c src/Distribution/Pot/RecursiveGetSources.lhs \
+            -o $(BUILD)/Distribution/Pot/RecursiveGetSources.o \
             -i$(BUILD)/
 
 $(BUILD)/Distribution/Pot/InstalledPackages.o : src/Distribution/Pot/InstalledPackages.lhs \
@@ -119,7 +128,8 @@ $(BUILD)/Distribution/Pot/InstalledPackages.o : src/Distribution/Pot/InstalledPa
             -package process \
             -package split \
             -package text \
-            -c $< -o $(BUILD)/Distribution/Pot/InstalledPackages.o \
+            -c src/Distribution/Pot/InstalledPackages.lhs \
+            -o $(BUILD)/Distribution/Pot/InstalledPackages.o \
             -i$(BUILD)/
 
 $(BUILD)/Distribution/Pot/HaskellSourceParser.o : src/Distribution/Pot/HaskellSourceParser.lhs \
@@ -130,7 +140,8 @@ $(BUILD)/Distribution/Pot/HaskellSourceParser.o : src/Distribution/Pot/HaskellSo
             -package base \
             -package filepath \
             -package text \
-            -c $< -o $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
+            -c src/Distribution/Pot/HaskellSourceParser.lhs \
+            -o $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
             -i$(BUILD)/
 
 $(BUILD)/Distribution/Pot/Types.o : src/Distribution/Pot/Types.lhs
@@ -138,7 +149,8 @@ $(BUILD)/Distribution/Pot/Types.o : src/Distribution/Pot/Types.lhs
 	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
             -package base \
             -package text \
-            -c $< -o $(BUILD)/Distribution/Pot/Types.o \
+            -c src/Distribution/Pot/Types.lhs \
+            -o $(BUILD)/Distribution/Pot/Types.o \
             -i$(BUILD)/
 $(BUILD)/SummarizeSources : $(BUILD)/SummarizeSources.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
