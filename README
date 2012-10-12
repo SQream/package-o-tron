@@ -2,14 +2,66 @@ Package-o-tron is a collection of utilities to help managing cabal
 files for your projects, maintaining Makefiles and other build
 systems, and also some which help with your package database.
 
+Problems:
 
-The central code is a function which takes a list of source root
-folders and a list of sources (e.g. the exposed modules of a library
-and/or the exes), then it parses and recursively finds all the locally
-imported files, producing a list of the filenames, module names, the
-imports from each file and for each import, the filenames of the local
-source files matching it, and the names of the matching installed
-packages with that module.
+I'd like to create a makefile with all the dependencies and packages
+made explicit for a set of haskell sources. This can be used for
+multithreaded builds, and to easily integrate into mixed language
+projects, etc.
+
+I'd like to know when my .cabal file is missing files in the
+other-modules section, or has extra files listed there. I'd also like
+to know if there are any unnecessary build-deps, or if any of the
+version constraints exclude the latest version of a dependency
+
+I'd like to be able to quickly and reliably create a collection of the
+tarballs for all the packages needed for some code, so I can
+painlessly install these in a new sandbox/system and know that all the
+same versions are there, and I don't need to access the hackage web
+site. Maybe this could also produce a command line to install these
+exact versions from hackage, so you can reproduce the packages on
+another system without having to copy a large amount of tarballs
+around.
+
+I'd like to maintain my package list so that there is only ever one
+version of a package installed, and I can easily try to 'upgrade' if
+some of the packages are not at the latest version.
+
+I'd like more checking on a cabal --dry-run: I want the reinstalls and
+installing different versions to be better highlighted, and I also
+want to know which packages to install are installing at something
+other than the latest available version.
+
+I'd like to quickly check the installed package list to see which
+packages aren't at the latest version, and which packages have more
+than one version installed.
+
+I'd like to test a cabal package with different versions of ghc, and
+check the lower package version constraints.
+
+I'd like to run a process which can automatically fill in the lower
+and upper bounds for dependencies in a .cabal file.
+
+If I'm installing a lot of packages, and some of them have version
+constraints which prevent another package's latest version from being
+installed, I'd like to just say override it, and the constraint is
+overridden and cabal tries to install will all the latest versions. At
+the moment, you have to cabal unpack, edit the .cabal file by hand,
+then figure out what command line to supply to cabal install.
+
+Package-o-tron can solve/ help with some of these problems (ultimately
+it should cover all of them).
+
+----
+
+The central code in package-o-tron can parse a set of local files and
+note each of the import statements with a list of matching source
+files and packages (hopefully each import matches either exactly one
+local file or exactly one package!). It will recurse automatically
+through your local source files, and look at your installed packages
+only.
+
+Tools:
 
 MakeHaskellMake
 
@@ -17,94 +69,30 @@ The Makefile in the package-o-tron package gives an example of how to
 use package-o-tron to help manage a makefile for haskell projects,
 using the MakeHaskellMake command.
 
-You could use a Makefile:
-
-* to quickly develop when you have multiple .cabal projects and don't
-  want to spend time reinstalling them when you do a rebuild (this can
-  also be much faster if you use -j and have lots of executables)
-
-* if you have files to compile as part of the development which aren't
-  in a cabal package, or if you want to integrate with existing
-  Makefiles, e.g. for mixed haskell/c projects.
-
 See the Makefile and autorules.mk in the repo (link below) for an
 example of how this works. This tool is used in the hssqlppp project
 Makefile (https://github.com/JakeWheat/hssqlppp), see the Makefile and
 autorules.mk there for another example.
 
+You could also use the library code to get dependencies to integrate
+with another build system other than Make.
 
 CabalLint
 
-CabalLint will check the following issues in your cabal file:
-
-* missing and superfluous other-modules and build-deps in library,exe
-  and test sections
-
-* version ranges which exclude the latest versions of a build-dep
-  (just uses packdeps from hackage)
-
-* a few more minor features planned
-
-run it like this:
-CabalLint package-o-tron.cabal
-No output means everything OK
-
+example run on package-o-tron itself:
+CabalLint package-o-tron.cabal --hide-package package-o-tron --hide-package haskell98 --hide-package haskell2010
+(usually you want to hide two of {base, haskell98, haskell2010})
+No output means everything OK.
 
 SavePackages
 
-Run on a set of sources, and it will show you all the packages
-referenced by these sources and their local dependencies, and all the
-packages which those packages depend on.
+This will try to find all the package tarballs needed by some source
+code (it looks for them in your $HOME/.cabal, it can also look in
+local folders for .cabal files).
 
-If you pass an output folder, it will attempt to copy a complete set
-of package tarballs to that folder which allow a fresh install on a
-machine without needed to download anything, and getting the exact
-same versions of all the packages. It does this by filtering out the
-packages which come with ghc, and looking for the tarballs of the
-remaining packages in your $HOME/.cabal folder.
-
-This can be used to create a 'blessed' set of packages and versions
-which you can test and deterministically reinstall on a fresh system
-or sandbox.
-
-
-Planned utils:
-
-Cabal build testing
-
-Use sandboxing to check the sdists from a .cabal install without error
-and if there are tests they run and pass. The sandboxing is used to
-check a range of versions of ghc crossed with the lowest and latest
-versions of the dependencies listed in the .cabal. Later, maybe this
-can be extended to search earlier versions of dependencies to get more
-accurate lower bounds.
-
-Package database lint:
-
-check your ghc package database for the following issues:
-duplicate packages installed
-packages which aren't the latest versions installed
-not sure how to automatically help with these situations though
-
-Third party cabal install checker:
-
-run a wrapper around cabal-install ... --dry-run. reports:
-any reinstalls (easy since cabal already does this)
-any different versions of already installed packages would be
-  installed
-any versions of packages which aren't the latest of those packages
-  would be installed
-
-Third party cabal file hacker:
-
-when you try to install a lot of packages, and some of them have
-version constraints on their dependencies which lead to another
-package being installed not at the latest version: this will cabal
-unpack the offending packages and alter their constraints to allow all
-the latest versions of packages automatically. Not completely safe of
-course, but I always end up doing this manually and it is really
-tedious.
-
+It can either show the filenames of the tarballs, or copy them all to
+a supplied folder (including running cabal configure && cabal sdist
+for the local packages and copying the produced tarball).
 
 
 Repository: https://github.com/JakeWheat/package-o-tron

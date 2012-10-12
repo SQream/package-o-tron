@@ -40,18 +40,27 @@ $(BUILD)/SavePackages.o : tools/SavePackages.lhs \
             -i$(BUILD)/
 
 $(BUILD)/MakeHaskellMake.o : tools/MakeHaskellMake.lhs \
-            $(BUILD)/Distribution/Pot/DeepDependencies.hi \
-            $(BUILD)/Distribution/Pot/InstalledPackages.hi \
-            $(BUILD)/Distribution/Pot/RecursiveGetSources.hi \
-            $(BUILD)/Distribution/Pot/Types.hi
+            $(BUILD)/Distribution/Pot/MakefileGen.hi
 	-mkdir -p $(BUILD)/
 	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
             -package base \
-            -package filepath \
             -package split \
             -package text \
             -package time \
             -c $< -o $(BUILD)/MakeHaskellMake.o \
+            -i$(BUILD)/
+
+$(BUILD)/Distribution/Pot/MakefileGen.o : src/Distribution/Pot/MakefileGen.lhs \
+            $(BUILD)/Distribution/Pot/DeepDependencies.hi \
+            $(BUILD)/Distribution/Pot/InstalledPackages.hi \
+            $(BUILD)/Distribution/Pot/RecursiveGetSources.hi \
+            $(BUILD)/Distribution/Pot/Types.hi
+	-mkdir -p $(BUILD)/Distribution/Pot/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
+            -package base \
+            -package filepath \
+            -package text \
+            -c $< -o $(BUILD)/Distribution/Pot/MakefileGen.o \
             -i$(BUILD)/
 
 $(BUILD)/CabalLint.o : tools/CabalLint.lhs \
@@ -200,6 +209,7 @@ $(BUILD)/MakeHaskellMake : $(BUILD)/MakeHaskellMake.o \
             $(BUILD)/Distribution/Pot/DeepDependencies.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
             $(BUILD)/Distribution/Pot/InstalledPackages.o \
+            $(BUILD)/Distribution/Pot/MakefileGen.o \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.o \
             $(BUILD)/Distribution/Pot/Types.o
 	-mkdir -p $(BUILD)/
@@ -209,6 +219,7 @@ $(BUILD)/MakeHaskellMake : $(BUILD)/MakeHaskellMake.o \
             $(BUILD)/Distribution/Pot/DeepDependencies.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
             $(BUILD)/Distribution/Pot/InstalledPackages.o \
+            $(BUILD)/Distribution/Pot/MakefileGen.o \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.o \
             $(BUILD)/Distribution/Pot/Types.o \
             -package Cabal \

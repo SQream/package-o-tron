@@ -1,16 +1,10 @@
 name:                package-o-tron
 version:             0.2.0.0
 synopsis:            Utilities for working with cabal packages and your package database
-
-description:         Utility to help managing Makefiles for Haskell projects, a cabal lint
-                     which can check the other-modules and build-deps
-                     sections in your cabal files, and a quick command
-                     that can show the direct package dependencies of
-                     a set of Haskell source files. See the README in
+description:         Utility to help managing installed packages, cabal files and
+                     Makefiles for Haskell projects. See the README in
                      the repo for more information:
                      <https://github.com/JakeWheat/package-o-tron>.
-
-
 license:             BSD3
 license-file:        LICENSE
 author:              Jake Wheat
@@ -35,6 +29,7 @@ library
                     Distribution.Pot.RecursiveGetSources,
                     Distribution.Pot.Types
                     Distribution.Pot.CabalLint
+                    Distribution.Pot.MakefileGen
   other-modules:    Distribution.Pot.HaskellSourceParser
   build-depends:    base >= 4 && < 5,
                     process,filepath,text,Cabal,split,directory,mtl,attoparsec,packdeps
@@ -42,7 +37,7 @@ library
 
 executable MakeHaskellMake
   build-depends:    base >= 4 && < 5,
-                    filepath,time,text,split,package-o-tron
+                    time,text,split,package-o-tron
   main-is:          MakeHaskellMake.lhs
   hs-source-dirs:   tools
 
