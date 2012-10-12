@@ -6,8 +6,8 @@ Problems:
 
 I'd like to create a makefile with all the dependencies and packages
 made explicit for a set of haskell sources. This can be used for
-multithreaded builds, and to easily integrate into mixed language
-projects, etc.
+parallel builds, and to easily integrate into mixed language projects,
+etc.
 
 I'd like to know when my .cabal file is missing files in the
 other-modules section, or has extra files listed there. I'd also like
@@ -18,14 +18,19 @@ I'd like to be able to quickly and reliably create a collection of the
 tarballs for all the packages needed for some code, so I can
 painlessly install these in a new sandbox/system and know that all the
 same versions are there, and I don't need to access the hackage web
-site. Maybe this could also produce a command line to install these
-exact versions from hackage, so you can reproduce the packages on
-another system without having to copy a large amount of tarballs
+site (so I won't be surprised by hackage being temporarily down, or by
+an updated package and the version constraints causing problems for
+cabal-install). This could also produce a command line to install
+these exact versions from hackage, so you can reproduce the packages
+on another system without having to copy a large amount of tarballs
 around.
 
-I'd like to maintain my package list so that there is only ever one
-version of a package installed, and I can easily try to 'upgrade' if
-some of the packages are not at the latest version.
+I'd like to maintain my package database so that there is only ever
+one version of a package installed, and I can easily try to 'upgrade'
+if some of the packages are not at the latest version (so all the
+packages are brought to the latest version without leaving any
+packages with multiple versions installed, and an undo to revert back
+to the previous versions if this fails).
 
 I'd like more checking on a cabal --dry-run: I want the reinstalls and
 installing different versions to be better highlighted, and I also
@@ -37,19 +42,20 @@ packages aren't at the latest version, and which packages have more
 than one version installed.
 
 I'd like to test a cabal package with different versions of ghc, and
-check the lower package version constraints.
+check the lowest and highest package version constraints (at least).
 
 I'd like to run a process which can automatically fill in the lower
-and upper bounds for dependencies in a .cabal file.
+and upper bounds for dependencies in a .cabal file (even if it has to
+run for hours!).
 
 If I'm installing a lot of packages, and some of them have version
 constraints which prevent another package's latest version from being
 installed, I'd like to just say 'override it', and the constraint is
-overridden and cabal tries to install with all the latest versions. At
+rewritten and cabal tries to install with all the latest versions. At
 the moment, you have to cabal unpack, edit the .cabal file by hand,
 then figure out what command line to supply to cabal install. Maybe it
-can also run all the available tests in the altered packages for
-additional assurances.
+can also run all the available tests in the altered packages and their
+reverse dependants for additional assurances.
 
 Package-o-tron can solve/ help with some of these problems (ultimately
 it should cover all of them).
@@ -77,7 +83,7 @@ Makefile (https://github.com/JakeWheat/hssqlppp), see the Makefile and
 autorules.mk there for another example.
 
 You could also use the library code to get dependencies to integrate
-with another build system other than Make.
+with a build system other than Make.
 
 CabalLint
 
@@ -86,8 +92,8 @@ CabalLint package-o-tron.cabal --hide-package package-o-tron --hide-package hask
 (usually you want to hide two of {base, haskell98, haskell2010})
 No output means everything OK.
 Currently reports:
-* imports which don't match any files or packages
-* imports which match more than one file/package
+* imports that don't match any files or packages
+* imports that match more than one file/package
 * missing build-deps
 * extra build-deps
 * missing other-modules
@@ -96,8 +102,8 @@ Currently reports:
 SavePackages
 
 This will try to find all the package tarballs needed by some source
-code (it looks for them in your $HOME/.cabal, it can also look in
-local folders for .cabal files).
+code (it looks for the tarballs in your $HOME/.cabal, it can also use
+local .cabal packages).
 
 It can either show the filenames of the tarballs, or copy them all to
 a supplied folder (including running cabal configure && cabal sdist
