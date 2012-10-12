@@ -1,4 +1,8 @@
 
+> -- | Parser to efficiently read the module name and
+> -- imports from a haskell file.
+> -- Does normal .hs and .lhs birdfeet style.
+> -- Deals with most (nested) block comments, apart from ones between the start of the 'module' or 'import' text in a decl and the end of the module name.
 
 > {-# LANGUAGE OverloadedStrings #-}
 > module Distribution.Pot.HaskellSourceParser
@@ -16,29 +20,23 @@
 > import System.FilePath
 > import Distribution.Pot.Types
 
-attempt to write a parser which can quickly read the module name and
-imports from a haskell file
-
-
-features:
-does normal .hs and .lhs birdfeet style
-deals with block comments
-stops parsing early when it has the info it needs
-
 > filterBirdfeet :: LT.Text -> LT.Text
 > filterBirdfeet = LT.unlines
 >                  . map (LT.drop 2)
 >                  . filter (\l -> not (LT.null l) && LT.head l == '>')
 >                  . LT.lines
 
+> -- | is the source regular haskell or birdfeet style literate haskell
 > data SourceType = Hs | Lhs
 
+> -- | get the source type from the extension in the filename
 > sourceTypeOf :: FilePath -> SourceType
 > sourceTypeOf fn = case takeExtension fn of
 >     ".hs" -> Hs
 >     ".lhs" -> Lhs
 >     e -> error $ "unknown extension: " ++ e
 
+> -- | parse some haskell source
 > parseSource :: SourceType -> LT.Text -> Either String SourceImports
 > parseSource Lhs t = parseSource Hs $ filterBirdfeet t
 > parseSource Hs t = eitherResult $ parse sourceFile t

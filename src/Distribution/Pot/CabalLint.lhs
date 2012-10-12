@@ -18,6 +18,7 @@ run in folder with cabal and find it automatically without passing on command li
 
 check with a bunch of packages on hackage
 
+> -- | Code to check your .cabal file for some  issues
 > {-# LANGUAGE TupleSections #-}
 > module Distribution.Pot.CabalLint
 >     (LintInfo(..)
@@ -44,15 +45,16 @@ check with a bunch of packages on hackage
 > import System.Directory
 > import Control.Arrow
 
+> -- | Report on a .cabal file
 > data LintInfo =
 >     LI
->     {unmatchedImports :: [(FilePath,T.Text)]
->     ,ambiguousImports :: [(FilePath,T.Text)]
->     ,extraOtherModules :: [((SectionType,T.Text),[T.Text])]
->     ,missingOtherModules :: [((SectionType,T.Text),[T.Text])]
->     ,extraBuildDeps :: [((SectionType,T.Text),[T.Text])]
->     ,missingBuildDeps :: [((SectionType,T.Text),[T.Text])]
->     ,wontAccept :: [(String,String)]
+>     {unmatchedImports :: [(FilePath,T.Text)] -- ^ filename, module name in the import of imports which don't match any local sources or any installed packages
+>     ,ambiguousImports :: [(FilePath,T.Text)] -- ^ imports which match more than one local source and/or installed package
+>     ,extraOtherModules :: [((SectionType,T.Text),[T.Text])] -- ^ section name (library, or exe name) plus list of modules in the other-module section which aren't needed
+>     ,missingOtherModules :: [((SectionType,T.Text),[T.Text])] -- ^ modules (which correspond to local sources) which are missing fro the other-modules section
+>     ,extraBuildDeps :: [((SectionType,T.Text),[T.Text])] -- ^ extra build-deps which aren't needed
+>     ,missingBuildDeps :: [((SectionType,T.Text),[T.Text])] -- ^ build-deps which are mssing
+>     ,wontAccept :: [(String,String)] -- ^ package name, version of packages which are too new for the version constraints in the .cabal
 >     }
 >     deriving Show
 
@@ -71,6 +73,7 @@ check with a bunch of packages on hackage
 >   ,siBuildDeps :: [T.Text]
 >   }
 
+> -- | Generate report for a .cabal file
 > cabalLint :: FilePath -- ^ path to the .cabal file
 >           -> [T.Text] -- ^ names of packages to hide
 >           -> IO LintInfo

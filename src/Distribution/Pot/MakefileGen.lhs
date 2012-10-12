@@ -64,11 +64,13 @@ specifies the -o explicitly since ghc outputs modules with a main as
   Main.o instead of their proper name (maybe this is a ghc bug?)
   -> it only does this when you use an outputdir
 
+> -- | information needed to compile a module to .o
 > data CompileModule =
 >     CompileModule
->     {cmObjName :: FilePath
->     ,cmDependencies :: [FilePath]
->     ,cmPackages :: [T.Text]}
+>     {cmObjName :: FilePath -- ^ the .o file for the module
+>     ,cmDependencies :: [FilePath] -- ^ the dependencies (.lhs and the .hi of the local imports)
+>     ,cmPackages :: [T.Text] -- ^ the packages needed to compile this module
+>     }
 
 > compileModule :: [T.Text] -> DeepSourceDeps -> CompileModule
 > compileModule hidePacks dssi =
@@ -111,14 +113,16 @@ create the makefile entry to link a exe:
 lists all the .o files needed in the link (doesn't use ghc --make),
 and all the packages explicitly
 
-TODO: try to split the lines a little less frequently
-
+> -- | info needed to link an .o to an executable
 > data ExeLink =
 >     ExeLink
->     {elExeName :: FilePath
->     ,elMangledExeName :: String
->     ,elObjects :: [FilePath]
->     ,elPackages :: [T.Text]}
+>     {elExeName :: FilePath -- ^ the name of the exe file
+>     ,elMangledExeName :: String -- ^ the mangled name (used to supply exe specific options from the handwritten part of your makefile)
+>     ,elObjects :: [FilePath] -- ^ the list of .o files to link in
+>     ,elPackages :: [T.Text] -- ^ all the packages needed to link the exe
+>     }
+
+TODO: try to split the lines a little less frequently
 
 > ppEL :: ExeLink -> String
 > ppEL el =
@@ -156,12 +160,14 @@ TODO: try to split the lines a little less frequently
 >                      . takeFileName
 >                      . dropExtension
 
+> -- | Represents the information needed to compile and link a bunch of haskell source files
 > data MakefileGen =
 >     MakefileGen
 >     {compiles :: [CompileModule]
 >     ,links :: [ExeLink]
 >     }
 
+> -- | convert the MakefileGen info to Makefile concrete syntax
 > ppMakefile :: MakefileGen -> String
 > ppMakefile mfg =
 >   unlines
@@ -169,7 +175,11 @@ TODO: try to split the lines a little less frequently
 >   ,intercalate "\n\n" $ map ppEL $ links mfg
 >   ,"\n\n%.hi : %.o\n\t@:"]
 
-> makefileGen :: [FilePath] -> [FilePath] -> [T.Text] -> IO MakefileGen
+> -- | Analyze a set of files and produce the information needed to generate a makefile
+> makefileGen :: [FilePath] -- ^ the folders where the source lives (same as -i for ghc)
+>             -> [FilePath] -- ^ the root sources, i.e. your exposed modules and/or mains
+>             -> [T.Text] -- ^ list of package names to hide
+>             -> IO MakefileGen
 > makefileGen srcFolders roots hidePackages = do
 >   pkgs <- readPackages
 >   let srcfs = if null srcFolders

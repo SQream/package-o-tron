@@ -1,5 +1,5 @@
 
-
+> -- | Calculate deep dependencies for local modules and packages for some source.
 > {-# LANGUAGE TupleSections #-}
 > module Distribution.Pot.DeepDependencies where
 
@@ -12,8 +12,10 @@
 creates the deep dependencies for each entry
 todo: use state monad to avoid repeated tree traversals
 
-> -- | recurses through the dependency lists to create the deep dependencies
-> deepDependencies :: [PackageInfo] -> [SourceDeps] -> [DeepSourceDeps]
+> -- | Recurses through the dependency lists to create the deep dependencies (essentially does transitive closures)
+> deepDependencies :: [PackageInfo] -- ^ installed packages
+>                  -> [SourceDeps] -- ^ analyzed source files
+>                  -> [DeepSourceDeps]
 > deepDependencies pkgs assis =
 >   let transitiveImports assi =
 >         let imports = sdImports assi

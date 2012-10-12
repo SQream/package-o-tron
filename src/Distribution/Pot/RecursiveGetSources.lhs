@@ -1,4 +1,5 @@
 
+> -- | Analyze the imports for a set of sources
 > {-# LANGUAGE OverloadedStrings,TupleSections,ScopedTypeVariables #-}
 > module Distribution.Pot.RecursiveGetSources (recursiveGetSources) where
 
@@ -17,7 +18,7 @@
 > import System.Directory
 
 > -- | takes a set of source files (these should be your exposed modules and/or exe sources)
-> -- and recurses through the imports to find all the local source files needed and to
+> -- and recurses through the imports to find all the local source files needed, and to
 > -- note the package names for any imports which match installed packages
 > recursiveGetSources :: [PackageInfo] -- ^ the return value from getPackages
 >                     -> [FilePath] -- ^ the source files to start with

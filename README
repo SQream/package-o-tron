@@ -12,7 +12,7 @@ projects, etc.
 I'd like to know when my .cabal file is missing files in the
 other-modules section, or has extra files listed there. I'd also like
 to know if there are any unnecessary build-deps, or if any of the
-version constraints exclude the latest version of a dependency
+version constraints exclude the latest version of a dependency.
 
 I'd like to be able to quickly and reliably create a collection of the
 tarballs for all the packages needed for some code, so I can
@@ -44,10 +44,12 @@ and upper bounds for dependencies in a .cabal file.
 
 If I'm installing a lot of packages, and some of them have version
 constraints which prevent another package's latest version from being
-installed, I'd like to just say override it, and the constraint is
-overridden and cabal tries to install will all the latest versions. At
+installed, I'd like to just say 'override it', and the constraint is
+overridden and cabal tries to install with all the latest versions. At
 the moment, you have to cabal unpack, edit the .cabal file by hand,
-then figure out what command line to supply to cabal install.
+then figure out what command line to supply to cabal install. Maybe it
+can also run all the available tests in the altered packages for
+additional assurances.
 
 Package-o-tron can solve/ help with some of these problems (ultimately
 it should cover all of them).
@@ -83,6 +85,13 @@ example run on package-o-tron itself:
 CabalLint package-o-tron.cabal --hide-package package-o-tron --hide-package haskell98 --hide-package haskell2010
 (usually you want to hide two of {base, haskell98, haskell2010})
 No output means everything OK.
+Currently reports:
+* imports which don't match any files or packages
+* imports which match more than one file/package
+* missing build-deps
+* extra build-deps
+* missing other-modules
+* extra other-modules
 
 SavePackages
 
@@ -96,5 +105,7 @@ for the local packages and copying the produced tarball).
 
 
 Repository: https://github.com/JakeWheat/package-o-tron
+
+Hackage: http://hackage.haskell.org/package/package-o-tron
 
 Contact: jakewheatmail@gmail.com
