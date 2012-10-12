@@ -3,13 +3,15 @@ files for your projects, maintaining Makefiles and other build
 systems, and also some which help with your package database.
 
 
-The central code is a function which takes a list of folders, then
-parses all the imports in all the haskell source in these folders. It
-then creates the dependency information between the different files,
-and the dependency on packages information (using ghc-pkg dump)
+The central code is a function which takes a list of source root
+folders and a list of sources (e.g. the exposed modules of a library
+and/or the exes), then it parses and recursively finds all the locally
+imported files, producing a list of the filenames, module names, the
+imports from each file and for each import, the filenames of the local
+source files matching it, and the names of the matching installed
+packages with that module.
 
-
-Currently implemented:
+MakeHaskellMake
 
 The Makefile in the package-o-tron package gives an example of how to
 use package-o-tron to help manage a makefile for haskell projects,
@@ -35,35 +37,38 @@ CabalLint
 
 CabalLint will check the following issues in your cabal file:
 
-*  missing and superfluous other-modules and build-deps in library,exe
-   and test sections
+* missing and superfluous other-modules and build-deps in library,exe
+  and test sections
 
-*  version ranges which exclude the latest versions of a build-dep
-   (just uses packdeps from hackage)
+* version ranges which exclude the latest versions of a build-dep
+  (just uses packdeps from hackage)
+
+* a few more minor features planned
 
 run it like this:
 CabalLint package-o-tron.cabal
 No output means everything OK
 
 
-ShowPackages
+SavePackages
 
-Run on a set of source folders, and it will show you all the packages
-referenced by the source in those folders
+Run on a set of sources, and it will show you all the packages
+referenced by these sources and their local dependencies, and all the
+packages which those packages depend on.
 
+If you pass an output folder, it will attempt to copy a complete set
+of package tarballs to that folder which allow a fresh install on a
+machine without needed to download anything, and getting the exact
+same versions of all the packages. It does this by filtering out the
+packages which come with ghc, and looking for the tarballs of the
+remaining packages in your $HOME/.cabal folder.
+
+This can be used to create a 'blessed' set of packages and versions
+which you can test and deterministically reinstall on a fresh system
+or sandbox.
 
 
 Planned utils:
-
-Showpackages: extend to show indirectly depended on packages as well
-
-blessed package set creation: run on some folders to get a package
-list. Then it follows the package dependencies to get all the needed
-non-system packages. Then it looks in your .cabal and copies out the
-tarballs for all these packages. Now you can create a fresh install in
-a sandbox or fresh machine without needing an internet connection, or
-worrying about if hackage is down, or if the latest set of packages
-don't install.
 
 Cabal build testing
 

@@ -16,29 +16,20 @@
 > import Data.Maybe
 > import System.Directory
 
-takes a set of root sources which are the files containing your mains
-and your exposed modules, and an additional set of source roots if you
-have source under different folders,
-recursively follows all the imports, to create an output set of
-information which contains all the local modules imported, with the
-list of imports for each file parsed out and annotated with the local
-file path or the name of the package the import refers to
-
-By getting the package information also, it can report when it finds
-an import which it doesn't recognise, or an import which could refer to
-two source files, or two packages, or a package and a source file,
-etc. For robustness: add multiple packages and emit warning, if local
-source and one or more packages match, emit warning and use local
-source only, and if two local sources match only then error?
-
-> recursiveGetSources :: [PackageInfo] -> [FilePath] -> [FilePath] -> IO [AnnotatedSSI]
+> -- | takes a set of source files (these should be your exposed modules and/or exe sources)
+> -- and recurses through the imports to find all the local source files needed and to
+> -- note the package names for any imports which match installed packages
+> recursiveGetSources :: [PackageInfo] -- ^ the return value from getPackages
+>                     -> [FilePath] -- ^ the source files to start with
+>                     -> [FilePath] -- ^ the folders which contain source files (same as the folders you pass to -i with ghc)
+>                     -> IO [SourceDeps]
 > recursiveGetSources pkgs rootSources rootFolders = do
 >   -- read and parse the root sources
 >   rs <- forM rootSources $ \fn -> do
 >           f <- LT.readFile fn
 >           -- todo: better error message
 >           let i = either error id $ parseSource (sourceTypeOf fn) f
->               root = case ssiModuleName i of
+>               root = case siModuleName i of
 >                        Nothing -> dropFileName fn
 >                        Just m | m == "Main" -> dropFileName fn
 >                        Just m -> let mfn = moduleNameToFileName m
@@ -64,18 +55,18 @@ memoized check for matching local source
  -> this also adds the local source to the running list
 also check the package list
 
-> type St = StateT [AnnotatedSSI] IO
+> type St = StateT [SourceDeps] IO
 
-> annotate :: [PackageInfo] -> [FilePath] -> FilePath -> SourceSyntaxInfo -> St ()
+> annotate :: [PackageInfo] -> [FilePath] -> FilePath -> SourceImports -> St ()
 > annotate pkgs roots fp ssi = do
->   iis <- forM (ssiImports ssi) $ \ip -> do
+>   iis <- forM (siImports ssi) $ \ip -> do
 >            -- get the matching packages
 >            let ims = map ImportFromPackage $ lookupPackageForModule pkgs ip
 >            lfs <- afs ip
 >            return (ip,sort $ nub $ lfs ++ ims)
->   let a = ASSI {assiFilename = fp
->                ,assiModuleName = ssiModuleName ssi
->                ,assiImports = sort $ nub iis}
+>   let a = SourceDeps {sdFilename = fp
+>                      ,sdModuleName = siModuleName ssi
+>                      ,sdImports = sort $ nub iis}
 >   modify (a:)
 >   return ()
 >   where
@@ -84,8 +75,8 @@ also check the package list
 >       -- if there is matching in the state, return that and we're done
 >       st <- get
 >       let memoed = flip mapMaybe st $ \assi ->
->                      case assiModuleName assi of
->                        Just m | m == ip -> Just $ T.pack $ assiFilename assi
+>                      case sdModuleName assi of
+>                        Just m | m == ip -> Just $ sdFilename assi
 >                        _ -> Nothing
 >       if not (null memoed)
 >         then return $ map ImportFromLocal memoed
@@ -106,5 +97,5 @@ also check the package list
 >                 newSrc <- lift $ LT.readFile fn
 >                 let nssi = either error id $ parseSource (sourceTypeOf fn) newSrc
 >                 annotate pkgs roots fn nssi
->                 return $ Just $ ImportFromLocal (T.pack fn)
+>                 return $ Just $ ImportFromLocal fn
 >             else return Nothing

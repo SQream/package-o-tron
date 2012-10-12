@@ -179,7 +179,7 @@ filter out all the ones in the root
 the names of the ones left is the expected list
 
 >         let expectedOtherMods = filter (`notElem` siModRoots si)
->                                 $ mapMaybe (assiModuleName . dssiAssi) asd
+>                                 $ mapMaybe (sdModuleName . ddSd) asd
 >         a <- checkLists (siSectionName si) "other-modules"
 >                         (siOtherMods si) expectedOtherMods
 
@@ -188,7 +188,7 @@ just nub the package deps of the whole asd list
 
 write some wrappers to get the package imports from a
 
->         let expectedDeps = sort $ nub $ concatMap (packageDeps . dssiAssi) asd
+>         let expectedDeps = sort $ nub $ concatMap (packageDeps . ddSd) asd
 >         b <- checkLists (siSectionName si) "build-depends"
 >                         (siBuildDeps si) expectedDeps
 >         return $ a && b

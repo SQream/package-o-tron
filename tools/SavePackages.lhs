@@ -23,11 +23,14 @@ current system also.
 > import System.FilePath.Find ((==?))
 > import System.Directory
 > import System.FilePath
+> import System.Process
+> import System.Exit
 > --import Text.Groom
 
 > main :: IO ()
 > main = do
 >   opts <- parseArgs `fmap` getArgs
+>   --putStrLn $ show opts
 >   pkgs <- readPackages
 >   let srcfs = if null (srcFolders opts)
 >               then ["."]
@@ -35,13 +38,14 @@ current system also.
 >   as <- recursiveGetSources pkgs (roots opts) srcfs
 >   let asd = deepDependencies pkgs as
 >   --putStrLn $ intercalate "\n" $ map groom asd
->   let allPacks = (sort $ nub $ concatMap dssiDeepDeepPackages asd)
+>   let allPacks = (sort $ nub $ concatMap ddDeepDeepPackages asd)
 >                  \\ hidePackages opts
 >   --putStrLn $ intercalate "\n" $ map T.unpack allPacks
 >   tarballs <- availableTarballs
 >   --putStrLn $ intercalate "\n" tarballs
 >   let nonSysPacks = filter (`notElem` systemPackages) allPacks
->   let wantTarballs = map (findTarball tarballs) $ map T.unpack nonSysPacks
+>   wantTarballs <- mapM (findTarball (customPackages opts) tarballs)
+>                      $ map T.unpack nonSysPacks
 >   -- putStrLn $ intercalate "\n" wantTarballs
 >   maybe (putStrLn $ intercalate "\n" wantTarballs)
 >         (\f -> do
@@ -49,15 +53,36 @@ current system also.
 >            mapM_ (\t -> copyFile t (f </> takeFileName t)) wantTarballs)
 >         $ outputFolder opts
 >   where
->     findTarball l p =
+>     findTarball cust l p = do
 >       let cands = filter ((==p) . dropVersion . takeBaseName) l
->       in case cands of
->            [] -> error $ "no tarball for " ++ p
->            [x] -> x
->            -- todo: get the latest tarball, or get the installed version
->            -- or something
->            xs -> error $ "multiple tarballs for " ++ p ++ "\n" ++ show xs
+>           c = lookup (T.pack p) cust
+>       case c of
+>         Just c' -> do
+>                save <- getCurrentDirectory
+>                setCurrentDirectory c'
+>                _ <- system "cabal configure"
+>                x <- system "cabal sdist"
+>                case x of
+>                  ExitFailure _ -> error $ "error when running cabal sdist in " ++ c'
+>                  _ -> return ()
+>                tfn <- ((c' </> "dist") </>) `fmap` getTarball p "dist"
+>                setCurrentDirectory save
+>                return tfn
+>         Nothing -> do
+>             case cands of
+>                        [] -> error $ "no tarball for " ++ p
+>                        [x] -> return x
+>                        -- todo: get the latest tarball, or get the installed version
+>                        -- or something
+>                        xs -> error $ "multiple tarballs for " ++ p ++ "\n" ++ show xs
 >     dropVersion = reverse . drop 1 . dropWhile (/='-') . reverse
+>     getTarball nm dir = do
+>         fs <- getDirectoryContents dir
+>         case filter (\x -> ".tar.gz" `isSuffixOf` x
+>                            && nm `isPrefixOf` x) fs of
+>             [] -> error $ "couldn't find tarball in " ++ dir
+>             [x] -> return x
+>             xs -> error $ "multiple tarballs in " ++ dir ++ "\n" ++ show xs
 
 TODO: maybe it should check if there is a newer tarball for a system
 package and emit a warning or error out if there is
@@ -78,22 +103,25 @@ package and emit a warning or error out if there is
 >     ,hidePackages :: [T.Text]
 >     ,roots :: [FilePath]
 >     ,outputFolder :: Maybe FilePath
+>     ,customPackages :: [(T.Text,FilePath)]
 >     } deriving Show
 
 > parseArgs :: [String] -> Opts
 > parseArgs s = do
->   f Nothing [] [] [] s
+>   f [] [] [] Nothing [] s
 >   where
->     f o is ps rs (x:xs) | "-i" `isPrefixOf` x =
+>     f is ps rs o cs (x:xs) | "-i" `isPrefixOf` x =
 >         let is' = splitOn ":" $ drop 2 x
->         in f o (is ++ is') ps rs xs
->     f o is ps rs ("--hide-package":p:xs) =
->         f o is (p:ps) rs xs
->     f _o _is _ps _rs (["--hide-package"]) =
+>         in f (is ++ is') ps rs o cs xs
+>     f is ps rs o cs ("--hide-package":p:xs) =
+>         f is (p:ps) rs o cs xs
+>     f _is _ps _rs _o _cs (["--hide-package"]) =
 >         error $ "no package name after --hide-package"
->     f Nothing is ps rs ("--output-folder":o:xs) =
->         f (Just o) is ps rs xs
->     f o is ps rs (x:xs) =
->         f o is ps (x:rs) xs
->     f o is ps rs [] =
->         Opts is (map T.pack ps) rs o
+>     f is ps rs Nothing cs ("--output-folder":o:xs) =
+>         f is ps rs (Just o) cs xs
+>     f is ps rs o cs ("--custom-package":nm:fn:xs) =
+>         f is ps rs o ((T.pack nm,fn):cs) xs
+>     f is ps rs o cs (x:xs) =
+>         f is ps (x:rs) o cs xs
+>     f is ps rs o cs [] =
+>         Opts is (map T.pack ps) rs o cs

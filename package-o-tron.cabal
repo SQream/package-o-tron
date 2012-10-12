@@ -53,6 +53,6 @@ executable CabalLint
 
 executable SavePackages
   build-depends:    base >= 4 && < 5,
-                    filepath,filemanip,package-o-tron,directory,split,text
+                    filepath,filemanip,package-o-tron,directory,split,text,process
   main-is:          SavePackages.lhs
   hs-source-dirs:   tools

@@ -2,7 +2,6 @@
 > module Distribution.Pot.InstalledPackages
 >     (readPackages
 >     ,lookupPackageForModule
->     ,PackageInfo(..)
 >     ) where
 
 > import Data.List
@@ -15,7 +14,10 @@
 > import Distribution.ModuleName
 > import qualified Data.Text as T
 
-> lookupPackageForModule :: [PackageInfo] -> T.Text -> [T.Text]
+> -- | finds all the packages which contain a given module
+> lookupPackageForModule :: [PackageInfo] -- ^ the return value of readPackages
+>                        -> T.Text -- ^ the module name to match (e.g. A.B.C)
+>                        -> [T.Text] -- ^ the matching package names
 > lookupPackageForModule pkgs m = do
 >   map piName $ filter ((m `elem`) . piExposedModules) pkgs
 

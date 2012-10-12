@@ -39,17 +39,17 @@ stops parsing early when it has the info it needs
 >     ".lhs" -> Lhs
 >     e -> error $ "unknown extension: " ++ e
 
-> parseSource :: SourceType -> LT.Text -> Either String SourceSyntaxInfo
+> parseSource :: SourceType -> LT.Text -> Either String SourceImports
 > parseSource Lhs t = parseSource Hs $ filterBirdfeet t
 > parseSource Hs t = eitherResult $ parse sourceFile t
 
-> sourceFile :: Parser SourceSyntaxInfo
+> sourceFile :: Parser SourceImports
 > sourceFile = do
 >   skipLines
 >   mn <- option Nothing (Just <$> modulep)
 >   is <- many importp
->   return SSI {ssiModuleName = mn
->              ,ssiImports = "Prelude" : is}
+>   return SourceImports {siModuleName = mn
+>                        ,siImports = "Prelude" : is}
 
 assume there are no block comments on a module or import line
 between the start of the line and the end of the module name
@@ -76,7 +76,7 @@ between the start of the line and the end of the module name
 > dottedIden :: Parser T.Text
 > dottedIden = do
 >   x <- satisfy isAlpha
->   y <- takeWhile (\x -> isAlphaNum x || x == '.')
+>   y <- takeWhile (\z -> isAlphaNum z || z == '.')
 >   return $ T.cons x y
 
 > -- skip any whitespace except newline
@@ -114,11 +114,11 @@ between the start of the line and the end of the module name
 >                                                  ,void $ string "-}"])
 >     suffix
 
-> voidTrace :: Show a => String -> Parser a -> Parser ()
+> {-voidTrace :: Show a => String -> Parser a -> Parser ()
 > voidTrace _m p = do
 >   _x <- p
 >   --trace (m ++ ": " ++ show x) $ return ()
->   return ()
+>   return ()-}
 
 > {-traceSkipWhile :: String -> (Char -> Bool)
 >                -> Parser ()

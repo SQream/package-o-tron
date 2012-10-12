@@ -67,7 +67,7 @@ good error message in this case also for same reason
 > import Data.List.Split
 > import qualified Data.Text as T
 > import Data.Either
-> import Debug.Trace
+> --import Debug.Trace
 
 generate a makefile entry to compile a .lhs or .hs to .o and .hi
 explicitly lists all the immediate .hi dependencies and package
@@ -82,16 +82,16 @@ specifies the -o explicitly since ghc outputs modules with a main as
 >     ,cmDependencies :: [FilePath]
 >     ,cmPackages :: [T.Text]}
 
-> compileModule :: [T.Text] -> DeepSSI -> CompileModule
+> compileModule :: [T.Text] -> DeepSourceDeps -> CompileModule
 > compileModule hidePacks dssi =
 >     let (modDeps,packDeps) = partitionEithers $
 >                              concatMap(\(n,i) -> map (either (Left . (n,)) (Right . (n,)))
 >                                                  $ map splitDep i)
->                              $ assiImports $ dssiAssi dssi
+>                              $ sdImports $ ddSd dssi
 >         pds = (sort $ nub $ map snd packDeps) \\ hidePacks
->         assi = dssiAssi dssi
->     in CompileModule (objOf (assiModuleName assi, assiFilename assi))
->                      ((assiFilename $ dssiAssi dssi)
+>         assi = ddSd dssi
+>     in CompileModule (objOf (sdModuleName assi, sdFilename assi))
+>                      ((sdFilename $ ddSd dssi)
 >                       : map hiOf (map (first Just) modDeps))
 >                      pds
 
@@ -145,19 +145,19 @@ TODO: try to split the lines a little less frequently
 >       ++ elObjects el
 >       ++ map ("-package " ++) (map T.unpack $ elPackages el))
 
-> exeLink :: [T.Text] -> DeepSSI -> ExeLink
+> exeLink :: [T.Text] -> DeepSourceDeps -> ExeLink
 > exeLink hidePacks dssi =
->     let exeName = takeBaseName $ assiFilename $ dssiAssi dssi
+>     let exeName = takeBaseName $ sdFilename $ ddSd dssi
 >         (modDeps,packDeps) = partitionEithers $
 >                              concatMap(\(n,i) -> map (either (Left . (n,)) (Right . (n,)))
 >                                                  $ map splitDep i)
->                              $ dssiDeepImports dssi
+>                              $ ddDeepImports dssi
 >         pds = (sort $ nub $ map snd packDeps) \\ hidePacks
->         assi = dssiAssi dssi
+>         assi = ddSd dssi
 
 >     in ExeLink {elExeName = "$(BUILD)" </> exeName
 >                ,elMangledExeName = mangledExeName exeName
->                ,elObjects = objOf (assiModuleName assi, assiFilename assi)
+>                ,elObjects = objOf (sdModuleName assi, sdFilename assi)
 >                             : map objOf (map (first Just) modDeps)
 >                ,elPackages = pds}
 >     where
@@ -211,6 +211,6 @@ TODO: try to split the lines a little less frequently
 >   -- write the compiles
 >   putStrLn $ intercalate "\n\n" $ map (ppCM . compileModule (hidePackages opts)) asd
 >   -- write the links
->   let exes = filter ((`elem` [Just "Main", Nothing]) . assiModuleName . dssiAssi) asd
+>   let exes = filter ((`elem` [Just "Main", Nothing]) . sdModuleName . ddSd) asd
 >   putStrLn $ intercalate "\n\n" $ map (ppEL . exeLink (hidePackages opts)) exes
 >   putStrLn "\n\n%.hi : %.o\n\t@:"
