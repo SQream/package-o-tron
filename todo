@@ -1,7 +1,15 @@
 2
-flag unrecognised imports and ambiguous imports in caballint,
-   makehaskellmake, etc.
-fix caballint for exes depending on the package
+
+turn makehaskellmake and savepackages into library modules
+   with commandline front ends
+
+cabal lint examples:
+run on package-o-tron
+remove other-module
+add unneeded package
+add other-modules with internal and exposed modules to caballint
+remove package-o-tron from caballist
+run without --hide-package on haskell98 and on package-o-tron
 
 3
 check cabal --dry-run for dups/ not latest version:
@@ -9,7 +17,10 @@ cabal already reports reinstall and new version, highlight these a lot
    better and add highlight for versions which aren't the latest
 package database checker: dup versions, non latest versions
 
-4 ...
+4
+try and support dynamic/profiling + th builds in MakeHaskellMake
+
+5 ...
 
 lint: duplicate listing, unreferenced files, extensions, benchmark
    sections

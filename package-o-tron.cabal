@@ -34,25 +34,26 @@ library
                     Distribution.Pot.InstalledPackages,
                     Distribution.Pot.RecursiveGetSources,
                     Distribution.Pot.Types
+                    Distribution.Pot.CabalLint
   other-modules:    Distribution.Pot.HaskellSourceParser
   build-depends:    base >= 4 && < 5,
-                    process,filepath,text,Cabal,split,directory,mtl,attoparsec
+                    process,filepath,text,Cabal,split,directory,mtl,attoparsec,packdeps
   hs-source-dirs:   src
 
 executable MakeHaskellMake
   build-depends:    base >= 4 && < 5,
-                    filepath,time,package-o-tron,text,split
+                    filepath,time,text,split,package-o-tron
   main-is:          MakeHaskellMake.lhs
   hs-source-dirs:   tools
 
 executable CabalLint
   build-depends:    base >= 4 && < 5,
-                    filepath,Cabal,packdeps,package-o-tron,directory,text
+                    text,package-o-tron
   main-is:          CabalLint.lhs
   hs-source-dirs:   tools
 
 executable SavePackages
   build-depends:    base >= 4 && < 5,
-                    filepath,filemanip,package-o-tron,directory,split,text,process
+                    filepath,filemanip,directory,split,text,process,package-o-tron
   main-is:          SavePackages.lhs
   hs-source-dirs:   tools

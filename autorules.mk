@@ -55,11 +55,20 @@ $(BUILD)/MakeHaskellMake.o : tools/MakeHaskellMake.lhs \
             -i$(BUILD)/
 
 $(BUILD)/CabalLint.o : tools/CabalLint.lhs \
+            $(BUILD)/Distribution/Pot/CabalLint.hi
+	-mkdir -p $(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
+            -package base \
+            -package text \
+            -c $< -o $(BUILD)/CabalLint.o \
+            -i$(BUILD)/
+
+$(BUILD)/Distribution/Pot/CabalLint.o : src/Distribution/Pot/CabalLint.lhs \
             $(BUILD)/Distribution/Pot/DeepDependencies.hi \
             $(BUILD)/Distribution/Pot/InstalledPackages.hi \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.hi \
             $(BUILD)/Distribution/Pot/Types.hi
-	-mkdir -p $(BUILD)/
+	-mkdir -p $(BUILD)/Distribution/Pot/
 	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
             -package Cabal \
             -package base \
@@ -67,7 +76,7 @@ $(BUILD)/CabalLint.o : tools/CabalLint.lhs \
             -package filepath \
             -package packdeps \
             -package text \
-            -c $< -o $(BUILD)/CabalLint.o \
+            -c $< -o $(BUILD)/Distribution/Pot/CabalLint.o \
             -i$(BUILD)/
 
 $(BUILD)/Distribution/Pot/DeepDependencies.o : src/Distribution/Pot/DeepDependencies.lhs \
@@ -214,6 +223,7 @@ $(BUILD)/MakeHaskellMake : $(BUILD)/MakeHaskellMake.o \
             -package time
 
 $(BUILD)/CabalLint : $(BUILD)/CabalLint.o \
+            $(BUILD)/Distribution/Pot/CabalLint.o \
             $(BUILD)/Distribution/Pot/DeepDependencies.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
             $(BUILD)/Distribution/Pot/InstalledPackages.o \
@@ -223,6 +233,7 @@ $(BUILD)/CabalLint : $(BUILD)/CabalLint.o \
 	$(HL) $(HL_OPTS) $(CABALLINT_EXTRA) \
             -o $(BUILD)/CabalLint \
             $(BUILD)/CabalLint.o \
+            $(BUILD)/Distribution/Pot/CabalLint.o \
             $(BUILD)/Distribution/Pot/DeepDependencies.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
             $(BUILD)/Distribution/Pot/InstalledPackages.o \
