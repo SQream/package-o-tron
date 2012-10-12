@@ -73,14 +73,13 @@ specifies the -o explicitly since ghc outputs modules with a main as
 > compileModule :: [T.Text] -> DeepSourceDeps -> CompileModule
 > compileModule hidePacks dssi =
 >     let (modDeps,packDeps) = partitionEithers $
->                              concatMap(\(n,i) -> map (either (Left . (n,)) (Right . (n,)))
->                                                  $ map splitDep i)
+>                              concatMap(\(n,i) -> map (either (Left . (n,)) (Right . (n,)) . splitDep) i)
 >                              $ sdImports $ ddSd dssi
->         pds = (sort $ nub $ map snd packDeps) \\ hidePacks
+>         pds = sort (nub $ map snd packDeps) \\ hidePacks
 >         assi = ddSd dssi
 >     in CompileModule (objOf (sdModuleName assi, sdFilename assi))
->                      ((sdFilename $ ddSd dssi)
->                       : map hiOf (map (first Just) modDeps))
+>                      (sdFilename (ddSd dssi)
+>                       : map (hiOf . first Just) modDeps)
 >                      pds
 
 > fOf :: String -> (Maybe T.Text,FilePath) -> FilePath
@@ -101,7 +100,7 @@ specifies the -o explicitly since ghc outputs modules with a main as
 >     ++ intercalate nl (cmDependencies cm)
 >     ++ "\n\t-mkdir -p " ++ dropFileName (cmObjName cm)
 >     ++ "\n\t$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ "
->     ++ nl ++ intercalate nl (map ("-package " ++) $ (map T.unpack $ cmPackages cm))
+>     ++ nl ++ intercalate nl (map (("-package " ++) . T.unpack) $ cmPackages cm)
 >     ++ nl ++ "-c $< -o " ++ cmObjName cm
 >     ++ nl ++ "-i$(BUILD)/"
 
@@ -131,29 +130,29 @@ TODO: try to split the lines a little less frequently
 >   ++ intercalate nl
 >      (["-o " ++ elExeName el]
 >       ++ elObjects el
->       ++ map ("-package " ++) (map T.unpack $ elPackages el))
+>       ++ map (("-package " ++) . T.unpack) (elPackages el))
 
 > exeLink :: [T.Text] -> DeepSourceDeps -> ExeLink
 > exeLink hidePacks dssi =
 >     let exeName = takeBaseName $ sdFilename $ ddSd dssi
 >         (modDeps,packDeps) = partitionEithers $
->                              concatMap(\(n,i) -> map (either (Left . (n,)) (Right . (n,)))
->                                                  $ map splitDep i)
+>                              concatMap(\(n,i) ->
+>                                   map (either (Left . (n,)) (Right . (n,)) . splitDep) i)
 >                              $ ddDeepImports dssi
->         pds = (sort $ nub $ map snd packDeps) \\ hidePacks
+>         pds = sort (nub $ map snd packDeps) \\ hidePacks
 >         assi = ddSd dssi
 
 >     in ExeLink {elExeName = "$(BUILD)" </> exeName
 >                ,elMangledExeName = mangledExeName exeName
 >                ,elObjects = objOf (sdModuleName assi, sdFilename assi)
->                             : map objOf (map (first Just) modDeps)
+>                             : map (objOf . first Just) modDeps
 >                ,elPackages = pds}
 >     where
 >         mangledExeName = (++ "_EXTRA")
->                      . map toUpper
->                      . map (\c -> case c of
+>                      . map (toUpper
+>                             . (\c -> case c of
 >                                       '/' -> '_'
->                                       _ -> c)
+>                                       _ -> c))
 >                      . takeFileName
 >                      . dropExtension
 

@@ -1,6 +1,6 @@
 2
 
-turn makehaskellmake and savepackages into library modules
+turn savepackages into library modules
    with commandline front ends
 
 cabal lint examples:

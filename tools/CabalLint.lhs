@@ -34,17 +34,16 @@
 >         else m : map r as
 
 > parseArgs :: [String] -> Opts
-> parseArgs s = do
->   f [] Nothing s
+> parseArgs = f [] Nothing
 >   where
 >     f ps c ("--hide-package":p:xs) =
 >         f (p:ps) c xs
 >     f _ps _c (["--hide-package"]) =
->         error $ "no package name after --hide-package"
+>         error "no package name after --hide-package"
 >     f ps Nothing (x:xs) =
 >         f ps (Just x) xs
 >     f _ps (Just _) (_:_) =
 >         error "please pass only one cabal file"
 >     f ps (Just c) [] =
 >         Opts (map T.pack ps) c
->     f _ps Nothing [] = error $ "please pass cabal file"
+>     f _ps Nothing [] = error "please pass cabal file"

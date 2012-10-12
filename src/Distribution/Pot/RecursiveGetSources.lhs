@@ -39,8 +39,8 @@
 >                                                  ++ T.unpack m ++ "\n" ++ fn ++ "\n" ++ mfn
 >           return (fn,(root,i))
 >   -- run the recursion
->   execStateT (mapM (uncurry $ annotate pkgs rootFolders)
->                     $ map (\(fn,(_,i)) -> (fn,i)) rs) []
+>   execStateT (mapM (uncurry (annotate pkgs rootFolders)
+>                     . (\(fn,(_,i)) -> (fn,i))) rs) []
 
 > moduleNameToFileName :: T.Text -> FilePath
 > moduleNameToFileName = map (\x -> case x of
@@ -84,7 +84,7 @@ also check the package list
 >       -- otherwise, try to find the file in all the roots
 >       -- any matches -> load and annotate
 >       let suf = moduleNameToFileName ip
->       concat <$> (forM roots $ \r -> do
+>       concat <$> forM roots (\r -> do
 >           a <- tryRead (r </> suf `addExtension` "hs")
 >           b <- tryRead (r </> suf `addExtension` "lhs")
 >           return $ catMaybes [a,b])

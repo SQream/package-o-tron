@@ -20,8 +20,7 @@
 >     } deriving Show
 
 > parseArgs :: [String] -> Opts
-> parseArgs s = do
->   f [] [] s
+> parseArgs = f [] []
 >   where
 >     f is rs (x:xs) | "-i" `isPrefixOf` x =
 >         let is' = splitOn ":" $ drop 2 x

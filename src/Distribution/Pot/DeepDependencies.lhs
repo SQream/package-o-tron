@@ -7,6 +7,7 @@
 > import Data.List
 > import Data.Maybe
 > import Data.Either
+> import Control.Arrow
 
 creates the deep dependencies for each entry
 todo: use state monad to avoid repeated tree traversals
@@ -19,7 +20,7 @@ todo: use state monad to avoid repeated tree traversals
 >             depFns = lefts $ concatMap (map splitDep . snd) imports
 >             depssis = filter ((`elem` depFns) . sdFilename) assis
 >         in imports ++ concatMap transitiveImports depssis
->       packMap = map (\p -> (piName p, piDependencies p)) pkgs
+>       packMap = map (piName &&& piDependencies) pkgs
 >       allPackDeps p = let ds = fromMaybe [] $ lookup p packMap
 >                       in p : concatMap allPackDeps ds
 >   in flip map assis $ \assi ->
@@ -35,4 +36,4 @@ todo: use state monad to avoid repeated tree traversals
 >              -- take this list, remove the packages that come with ghc
 >              -- now you have exactly all the packages you need to download
 >              -- on a fresh sandbox/system to compile the source code
->             ,ddDeepDeepPackages = sort $ nub $ concatMap allPackDeps $ deepPks}
+>             ,ddDeepDeepPackages = sort $ nub $ concatMap allPackDeps deepPks}

@@ -59,8 +59,7 @@ between the start of the line and the end of the module name
 >     void $ string "module"
 >     sws
 >     mn <- dottedIden
->     dropTillEndOfLine
->     skipLines
+>     dropTillEndOfLineAndSkipLines
 >     return mn
 
 > importp :: Parser T.Text
@@ -69,8 +68,7 @@ between the start of the line and the end of the module name
 >     sws
 >     option () (void (string "qualified") >> sws)
 >     mn <- dottedIden
->     dropTillEndOfLine
->     skipLines
+>     dropTillEndOfLineAndSkipLines
 >     return mn
 
 > dottedIden :: Parser T.Text
@@ -81,7 +79,7 @@ between the start of the line and the end of the module name
 
 > -- skip any whitespace except newline
 > sws :: Parser ()
-> sws = skipWhile $ \x -> isSpace x && not (x == '\n')
+> sws = skipWhile $ \x -> isSpace x && (x /= '\n')
 
 > -- skip lines which don't start with a character
 > -- so we can get to the next import or declaration
@@ -91,8 +89,7 @@ between the start of the line and the end of the module name
 >     choice [do
 >             x <- peekChar
 >             guard $ maybe True (not . isAlpha) x
->             dropTillEndOfLine
->             skipLines
+>             dropTillEndOfLineAndSkipLines
 >            ,return ()]
 
 > -- skip till end of current line, but also handles
@@ -103,6 +100,10 @@ between the start of the line and the end of the module name
 >     void $ manyTill anyChar (choice
 >                              [blockComment >> dropTillEndOfLine
 >                              ,void $ char '\n'])
+>     skipLines
+
+> dropTillEndOfLineAndSkipLines :: Parser ()
+> dropTillEndOfLineAndSkipLines = dropTillEndOfLine >> skipLines
 
 > blockComment :: Parser ()
 > blockComment = do

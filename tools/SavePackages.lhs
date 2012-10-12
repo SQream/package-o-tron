@@ -38,14 +38,14 @@ current system also.
 >   as <- recursiveGetSources pkgs (roots opts) srcfs
 >   let asd = deepDependencies pkgs as
 >   --putStrLn $ intercalate "\n" $ map groom asd
->   let allPacks = (sort $ nub $ concatMap ddDeepDeepPackages asd)
+>   let allPacks = sort (nub $ concatMap ddDeepDeepPackages asd)
 >                  \\ hidePackages opts
 >   --putStrLn $ intercalate "\n" $ map T.unpack allPacks
 >   tarballs <- availableTarballs
 >   --putStrLn $ intercalate "\n" tarballs
 >   let nonSysPacks = filter (`notElem` systemPackages) allPacks
->   wantTarballs <- mapM (findTarball (customPackages opts) tarballs)
->                      $ map T.unpack nonSysPacks
+>   wantTarballs <- mapM (findTarball (customPackages opts) tarballs
+>                         . T.unpack) nonSysPacks
 >   -- putStrLn $ intercalate "\n" wantTarballs
 >   maybe (putStrLn $ intercalate "\n" wantTarballs)
 >         (\f -> do
@@ -68,7 +68,7 @@ current system also.
 >                tfn <- ((c' </> "dist") </>) `fmap` getTarball p "dist"
 >                setCurrentDirectory save
 >                return tfn
->         Nothing -> do
+>         Nothing ->
 >             case cands of
 >                        [] -> error $ "no tarball for " ++ p
 >                        [x] -> return x
@@ -107,8 +107,7 @@ package and emit a warning or error out if there is
 >     } deriving Show
 
 > parseArgs :: [String] -> Opts
-> parseArgs s = do
->   f [] [] [] Nothing [] s
+> parseArgs = f [] [] [] Nothing []
 >   where
 >     f is ps rs o cs (x:xs) | "-i" `isPrefixOf` x =
 >         let is' = splitOn ":" $ drop 2 x
@@ -116,7 +115,7 @@ package and emit a warning or error out if there is
 >     f is ps rs o cs ("--hide-package":p:xs) =
 >         f is (p:ps) rs o cs xs
 >     f _is _ps _rs _o _cs (["--hide-package"]) =
->         error $ "no package name after --hide-package"
+>         error "no package name after --hide-package"
 >     f is ps rs Nothing cs ("--output-folder":o:xs) =
 >         f is ps rs (Just o) cs xs
 >     f is ps rs o cs ("--custom-package":nm:fn:xs) =

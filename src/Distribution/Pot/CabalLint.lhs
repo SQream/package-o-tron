@@ -176,7 +176,7 @@ unmatched imports
 ambiguous imports
 
 >         let aImports sd =
->                map ((sdFilename sd,)) $ filter ((>1) . length . snd) $ sdImports sd
+>                map (sdFilename sd,) $ filter ((>1) . length . snd) $ sdImports sd
 >             ambImports :: [(FilePath, T.Text)]
 >             ambImports = concatMap (map (second fst) . aImports . ddSd) asd
 
@@ -208,7 +208,7 @@ just nub the package deps of the whole asd list
 >   case checkDeps newest di2 of
 >             (_pn, _v, AllNewest) ->
 >                 return []
->             (_pn, _v, WontAccept p _) -> do
+>             (_pn, _v, WontAccept p _) ->
 >                 --putStrLn "Cannot accept the following packages"
 >                 return p
 

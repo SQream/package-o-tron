@@ -264,3 +264,4 @@ $(BUILD)/CabalLint : $(BUILD)/CabalLint.o \
 
 %.hi : %.o
 	@:
+

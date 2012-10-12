@@ -18,7 +18,7 @@
 > lookupPackageForModule :: [PackageInfo] -- ^ the return value of readPackages
 >                        -> T.Text -- ^ the module name to match (e.g. A.B.C)
 >                        -> [T.Text] -- ^ the matching package names
-> lookupPackageForModule pkgs m = do
+> lookupPackageForModule pkgs m =
 >   map piName $ filter ((m `elem`) . piExposedModules) pkgs
 
 > -- | parses the output of ghc-pkg dump
