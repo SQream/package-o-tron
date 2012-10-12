@@ -1,10 +1,8 @@
 name:                package-o-tron
 version:             0.2.0.0
-synopsis:            Utilities for working with .cabal files, makefiles/
-                     dependencies for haskell source, and your package database
-description:         Utility to help managing installed packages, cabal files and
-                     Makefiles for Haskell projects. See the README in
-                     the repo for more information:
+synopsis:            Dependencies for haskell source for .cabal files, Makefiles and other utils
+description:         Utilities to check cabal files, create Makefiles for
+                     Haskell projects, etc.. See the README for more information:
                      <https://github.com/JakeWheat/package-o-tron>.
 license:             BSD3
 license-file:        LICENSE
@@ -14,7 +12,7 @@ copyright:           Jake Wheat 2012
 category:            Development
 build-type:          Simple
 cabal-version:       >=1.8
-tested-with:         ghc==7.4.1
+tested-with:         GHC==7.4.1
 bug-reports:         https://github.com/JakeWheat/package-o-tron/issues
 
 extra-source-files:  autorules.mk
