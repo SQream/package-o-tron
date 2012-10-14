@@ -2,7 +2,9 @@
 > -- | Parser to efficiently read the module name and
 > -- imports from a haskell file.
 > -- Does normal .hs and .lhs birdfeet style.
-> -- Deals with most (nested) block comments, apart from ones between the start of the 'module' or 'import' text in a decl and the end of the module name.
+> -- Deals with most (nested) block comments, apart from ones between the
+> -- start of the line with 'module' or 'import' text in a decl and the
+> -- end of the module name on that line.
 
 > {-# LANGUAGE OverloadedStrings #-}
 > module Distribution.Pot.HaskellSourceParser
@@ -19,12 +21,6 @@
 > import Prelude hiding (takeWhile)
 > import System.FilePath
 > import Distribution.Pot.Types
-
-> filterBirdfeet :: LT.Text -> LT.Text
-> filterBirdfeet = LT.unlines
->                  . map (LT.drop 2)
->                  . filter (\l -> not (LT.null l) && LT.head l == '>')
->                  . LT.lines
 
 > -- | is the source regular haskell or birdfeet style literate haskell
 > data SourceType = Hs | Lhs
@@ -112,6 +108,13 @@ between the start of the line and the end of the module name
 >                                                   suffix
 >                                                  ,void $ string "-}"])
 >     suffix
+
+> filterBirdfeet :: LT.Text -> LT.Text
+> filterBirdfeet = LT.unlines
+>                  . map (LT.drop 2)
+>                  . filter (\l -> not (LT.null l) && LT.head l == '>')
+>                  . LT.lines
+
 
 > {-voidTrace :: Show a => String -> Parser a -> Parser ()
 > voidTrace _m p = do

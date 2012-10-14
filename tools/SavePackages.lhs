@@ -44,8 +44,8 @@ current system also.
 >   tarballs <- availableTarballs
 >   --putStrLn $ intercalate "\n" tarballs
 >   let nonSysPacks = filter (`notElem` systemPackages) allPacks
->   wantTarballs <- mapM (findTarball (customPackages opts) tarballs
->                         . T.unpack) nonSysPacks
+>   wantTarballs <- mapM (findTarball (customPackages opts) tarballs)
+>                        nonSysPacks
 >   -- putStrLn $ intercalate "\n" wantTarballs
 >   maybe (putStrLn $ intercalate "\n" wantTarballs)
 >         (\f -> do
@@ -54,8 +54,8 @@ current system also.
 >         $ outputFolder opts
 >   where
 >     findTarball cust l p = do
->       let cands = filter ((==p) . dropVersion . takeBaseName) l
->           c = lookup (T.pack p) cust
+>       let cands = filter ((==p) . T.pack . dropVersion . takeBaseName) l
+>           c = lookup p cust
 >       case c of
 >         Just c' -> do
 >                save <- getCurrentDirectory
@@ -70,13 +70,14 @@ current system also.
 >                return tfn
 >         Nothing ->
 >             case cands of
->                        [] -> error $ "no tarball for " ++ p
+>                        [] -> error $ "no tarball for " ++ T.unpack p
 >                        [x] -> return x
 >                        -- todo: get the latest tarball, or get the installed version
 >                        -- or something
->                        xs -> error $ "multiple tarballs for " ++ p ++ "\n" ++ show xs
+>                        xs -> error $ "multiple tarballs for " ++ (T.unpack p) ++ "\n" ++ show xs
 >     dropVersion = reverse . drop 1 . dropWhile (/='-') . reverse
->     getTarball nm dir = do
+>     getTarball nm' dir = do
+>         let nm = T.unpack nm'
 >         fs <- getDirectoryContents dir
 >         case filter (\x -> ".tar.gz" `isSuffixOf` x
 >                            && nm `isPrefixOf` x) fs of
@@ -84,11 +85,13 @@ current system also.
 >             [x] -> return x
 >             xs -> error $ "multiple tarballs in " ++ dir ++ "\n" ++ show xs
 
-TODO: maybe it should check if there is a newer tarball for a system
-package and emit a warning or error out if there is
-
 > systemPackages :: [T.Text]
-> systemPackages = ["Cabal","array","base","bin-package-db","binary","bytestring","containers","deepseq","directory","extensible-exceptions","filepath","ghc","ghc-prim","haskell2010","haskell98","hoopl","hpc","integer-gmp","old-locale","old-time","pretty","process","rts","template-haskell","time","unix"]
+> systemPackages = ["Cabal","array","base","bin-package-db","binary"
+>                  ,"bytestring","containers","deepseq","directory"
+>                  ,"extensible-exceptions","filepath","ghc","ghc-prim"
+>                  ,"haskell2010","haskell98","hoopl","hpc","integer-gmp"
+>                  ,"old-locale","old-time","pretty","process","rts"
+>                  ,"template-haskell","time","unix"]
 
 
 > availableTarballs :: IO [FilePath]

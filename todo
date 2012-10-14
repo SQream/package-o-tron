@@ -2,9 +2,6 @@
 
 turn savepackages into library modules
    with commandline front ends
-move the pretty print of cabal lint exe to library
-
-tidy up the makefile output
 
 cabal lint examples:
 run on package-o-tron
@@ -19,6 +16,7 @@ check cabal --dry-run for dups/ not latest version:
 cabal already reports reinstall and new version, highlight these a lot
    better and add highlight for versions which aren't the latest
 package database checker: dup versions, non latest versions
+see http://hackage.haskell.org/package/highlight-versions
 
 4
 try and support dynamic/profiling + th builds in MakeHaskellMake

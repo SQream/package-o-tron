@@ -24,6 +24,7 @@ check with a bunch of packages on hackage
 >     (LintInfo(..)
 >     ,SectionType(..)
 >     ,cabalLint
+>     ,ppLi
 >     ) where
 
 
@@ -134,9 +135,9 @@ check with a bunch of packages on hackage
 >   -- do the checks
 >   pkgs <- filter ((`notElem` hidePackages) . piName) <$> readPackages
 >   (uis,ais,eos,mos,eds,mds) <- unzip6 <$> mapM (checkModulesAndPackages pkgs libPi) sis
->   let fi = filter (not . null . snd)
 >   badPvs <- checkNewestVersions cabalFn
->   return $ LI (concat uis) (concat ais) (fi eos) (fi mos) (fi eds) (fi mds) (fi badPvs)
+>   let fi = filter (not . null . snd)
+>   return $ LI (concat uis) (concat ais) (fi eos) (fi mos) (fi eds) (fi mds) badPvs
 >   where
 >     moduleString = T.pack . intercalate "." . components
 >     dependencyName (Dependency (PackageName s) _) = s
@@ -215,3 +216,22 @@ just nub the package deps of the whole asd list
 >                 --putStrLn "Cannot accept the following packages"
 >                 return p
 
+> -- | Rough show for information in LintInfo
+> ppLi :: LintInfo -> String
+> ppLi li = unlines $
+>            showItems "unmatchedImports" sft (unmatchedImports li)
+>            ++ showItems "ambiguousImports" sft (ambiguousImports li)
+>            ++ showItems "extra other modules" sd (extraOtherModules li)
+>            ++ showItems "missing other modules" sd (missingOtherModules li)
+>            ++ showItems "extra build deps" sd (extraBuildDeps li)
+>            ++ showItems "missing build deps" sd (missingBuildDeps li)
+>            ++ showItems "won't accept packages" sv (wontAccept li)
+>   where
+>     sft (f,t) = f ++ ": " ++ T.unpack t
+>     sd ((st,t),ds) = T.unpack t ++ "(" ++ show st ++ "): " ++ unlines (map T.unpack ds)
+>     sv (p,v) = p ++ "-" ++ v
+>     showItems :: String -> (a -> String) -> [a] -> [String]
+>     showItems m r as =
+>         if null as
+>         then []
+>         else m : map r as

@@ -12,7 +12,8 @@ etc.
 I'd like to know when my .cabal file is missing files in the
 other-modules section, or has extra files listed there. I'd also like
 to know if there are any unnecessary build-deps, or if any of the
-version constraints exclude the latest version of a dependency.
+version constraints exclude the latest version of a dependency
+(packdeps on hackage covers the last bit).
 
 I'd like to be able to quickly and reliably create a collection of the
 tarballs for all the packages needed for some code, so I can
@@ -40,6 +41,8 @@ other than the latest available version.
 I'd like to quickly check the installed package list to see which
 packages aren't at the latest version, and which packages have more
 than one version installed.
+
+(highlight-versions on hackage covers part of these two.)
 
 I'd like to test a cabal package with different versions of ghc, and
 check the lowest and highest package version constraints (at least).

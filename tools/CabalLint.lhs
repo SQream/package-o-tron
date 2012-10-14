@@ -1,4 +1,19 @@
 
+todo:
+add --use-base, --use-haskell98, --use-haskell2010 as shorthands for hiding the other two
+and have --use-base as the default
+hide the installed package with same name by default (no override at the moment)
+then example of running on pot.cabal changes from:
+CabalLint package-o-tron.cabal  --hide-package package-o-tron --hide-package haskell98 --hide-package haskell2010
+to
+CabalLint package-o-tron.cabal
+deal with not being in the same folder as the .cabal file
+deal with finding the cabal in the current folder by default so can run
+CabaLint
+on its own if you are in the right folder (maybe it can search upwards like e.g. git as well?)
+deal with being pointed at a folder containing the .cabal file instead
+of the .cabal file itself
+
 > {-# LANGUAGE TupleSections #-}
 > import System.Environment
 > import qualified Data.Text as T
@@ -13,25 +28,7 @@
 > main :: IO ()
 > main = do
 >   opts <- parseArgs `fmap` getArgs
->   li <- cabalLint (cabalFile opts) (hidePackages opts)
->   putStrLn $ unlines $
->            showItems "unmatchedImports" sft (unmatchedImports li)
->            ++ showItems "ambiguousImports" sft (ambiguousImports li)
->            ++ showItems "extra other modules" sd (extraOtherModules li)
->            ++ showItems "missing other modules" sd (missingOtherModules li)
->            ++ showItems "extra build deps" sd (extraBuildDeps li)
->            ++ showItems "missing build deps" sd (missingBuildDeps li)
->            ++ showItems "won't accept packages" sv (wontAccept li)
->   return ()
->   where
->     sft (f,t) = f ++ ": " ++ T.unpack t
->     sd ((st,t),ds) = T.unpack t ++ "(" ++ show st ++ "): " ++ unlines (map T.unpack ds)
->     sv (p,v) = p ++ "-" ++ v
->     showItems :: String -> (a -> String) -> [a] -> [String]
->     showItems m r as =
->         if null as
->         then []
->         else m : map r as
+>   cabalLint (cabalFile opts) (hidePackages opts) >>= putStrLn . ppLi
 
 > parseArgs :: [String] -> Opts
 > parseArgs = f [] Nothing

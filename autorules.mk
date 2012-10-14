@@ -5,24 +5,20 @@ $(BUILD)/SummarizeSources.o : tools/SummarizeSources.lhs \
             $(BUILD)/Distribution/Pot/InstalledPackages.hi \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.hi
 	-mkdir -p $(BUILD)/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package base \
-            -package groom \
-            -package split \
-            -c tools/SummarizeSources.lhs \
-            -o $(BUILD)/SummarizeSources.o \
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package base -package groom -package split -c \
+            tools/SummarizeSources.lhs -o $(BUILD)/SummarizeSources.o \
             -i$(BUILD)/
+
 
 $(BUILD)/TestHaskellSourceParser.o : tools/TestHaskellSourceParser.lhs \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.hi
 	-mkdir -p $(BUILD)/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package base \
-            -package groom \
-            -package text \
-            -c tools/TestHaskellSourceParser.lhs \
-            -o $(BUILD)/TestHaskellSourceParser.o \
-            -i$(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package base -package groom -package text -c \
+            tools/TestHaskellSourceParser.lhs -o \
+            $(BUILD)/TestHaskellSourceParser.o -i$(BUILD)/
+
 
 $(BUILD)/SavePackages.o : tools/SavePackages.lhs \
             $(BUILD)/Distribution/Pot/DeepDependencies.hi \
@@ -30,29 +26,20 @@ $(BUILD)/SavePackages.o : tools/SavePackages.lhs \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.hi \
             $(BUILD)/Distribution/Pot/Types.hi
 	-mkdir -p $(BUILD)/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package base \
-            -package directory \
-            -package filemanip \
-            -package filepath \
-            -package process \
-            -package split \
-            -package text \
-            -c tools/SavePackages.lhs \
-            -o $(BUILD)/SavePackages.o \
-            -i$(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package base -package directory -package filemanip -package \
+            filepath -package process -package split -package text -c \
+            tools/SavePackages.lhs -o $(BUILD)/SavePackages.o -i$(BUILD)/
+
 
 $(BUILD)/MakeHaskellMake.o : tools/MakeHaskellMake.lhs \
             $(BUILD)/Distribution/Pot/MakefileGen.hi
 	-mkdir -p $(BUILD)/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package base \
-            -package split \
-            -package text \
-            -package time \
-            -c tools/MakeHaskellMake.lhs \
-            -o $(BUILD)/MakeHaskellMake.o \
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package base -package split -package text -package time -c \
+            tools/MakeHaskellMake.lhs -o $(BUILD)/MakeHaskellMake.o \
             -i$(BUILD)/
+
 
 $(BUILD)/Distribution/Pot/MakefileGen.o : src/Distribution/Pot/MakefileGen.lhs \
             $(BUILD)/Distribution/Pot/DeepDependencies.hi \
@@ -60,23 +47,19 @@ $(BUILD)/Distribution/Pot/MakefileGen.o : src/Distribution/Pot/MakefileGen.lhs \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.hi \
             $(BUILD)/Distribution/Pot/Types.hi
 	-mkdir -p $(BUILD)/Distribution/Pot/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package base \
-            -package filepath \
-            -package text \
-            -c src/Distribution/Pot/MakefileGen.lhs \
-            -o $(BUILD)/Distribution/Pot/MakefileGen.o \
-            -i$(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package base -package filepath -package text -c \
+            src/Distribution/Pot/MakefileGen.lhs -o \
+            $(BUILD)/Distribution/Pot/MakefileGen.o -i$(BUILD)/
+
 
 $(BUILD)/CabalLint.o : tools/CabalLint.lhs \
             $(BUILD)/Distribution/Pot/CabalLint.hi
 	-mkdir -p $(BUILD)/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package base \
-            -package text \
-            -c tools/CabalLint.lhs \
-            -o $(BUILD)/CabalLint.o \
-            -i$(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package base -package text -c tools/CabalLint.lhs -o \
+            $(BUILD)/CabalLint.o -i$(BUILD)/
+
 
 $(BUILD)/Distribution/Pot/CabalLint.o : src/Distribution/Pot/CabalLint.lhs \
             $(BUILD)/Distribution/Pot/DeepDependencies.hi \
@@ -84,74 +67,56 @@ $(BUILD)/Distribution/Pot/CabalLint.o : src/Distribution/Pot/CabalLint.lhs \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.hi \
             $(BUILD)/Distribution/Pot/Types.hi
 	-mkdir -p $(BUILD)/Distribution/Pot/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package Cabal \
-            -package base \
-            -package directory \
-            -package filepath \
-            -package packdeps \
-            -package text \
-            -c src/Distribution/Pot/CabalLint.lhs \
-            -o $(BUILD)/Distribution/Pot/CabalLint.o \
-            -i$(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package Cabal -package base -package directory -package filepath \
+            -package packdeps -package text -c \
+            src/Distribution/Pot/CabalLint.lhs -o \
+            $(BUILD)/Distribution/Pot/CabalLint.o -i$(BUILD)/
+
 
 $(BUILD)/Distribution/Pot/DeepDependencies.o : src/Distribution/Pot/DeepDependencies.lhs \
             $(BUILD)/Distribution/Pot/Types.hi
 	-mkdir -p $(BUILD)/Distribution/Pot/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package base \
-            -c src/Distribution/Pot/DeepDependencies.lhs \
-            -o $(BUILD)/Distribution/Pot/DeepDependencies.o \
-            -i$(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package base -c src/Distribution/Pot/DeepDependencies.lhs -o \
+            $(BUILD)/Distribution/Pot/DeepDependencies.o -i$(BUILD)/
+
 
 $(BUILD)/Distribution/Pot/RecursiveGetSources.o : src/Distribution/Pot/RecursiveGetSources.lhs \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.hi \
             $(BUILD)/Distribution/Pot/InstalledPackages.hi \
             $(BUILD)/Distribution/Pot/Types.hi
 	-mkdir -p $(BUILD)/Distribution/Pot/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package base \
-            -package directory \
-            -package filepath \
-            -package mtl \
-            -package text \
-            -c src/Distribution/Pot/RecursiveGetSources.lhs \
-            -o $(BUILD)/Distribution/Pot/RecursiveGetSources.o \
-            -i$(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package base -package directory -package filepath -package mtl \
+            -package text -c src/Distribution/Pot/RecursiveGetSources.lhs -o \
+            $(BUILD)/Distribution/Pot/RecursiveGetSources.o -i$(BUILD)/
+
 
 $(BUILD)/Distribution/Pot/InstalledPackages.o : src/Distribution/Pot/InstalledPackages.lhs \
             $(BUILD)/Distribution/Pot/Types.hi
 	-mkdir -p $(BUILD)/Distribution/Pot/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package Cabal \
-            -package base \
-            -package process \
-            -package split \
-            -package text \
-            -c src/Distribution/Pot/InstalledPackages.lhs \
-            -o $(BUILD)/Distribution/Pot/InstalledPackages.o \
-            -i$(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package Cabal -package base -package process -package split \
+            -package text -c src/Distribution/Pot/InstalledPackages.lhs -o \
+            $(BUILD)/Distribution/Pot/InstalledPackages.o -i$(BUILD)/
+
 
 $(BUILD)/Distribution/Pot/HaskellSourceParser.o : src/Distribution/Pot/HaskellSourceParser.lhs \
             $(BUILD)/Distribution/Pot/Types.hi
 	-mkdir -p $(BUILD)/Distribution/Pot/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package attoparsec \
-            -package base \
-            -package filepath \
-            -package text \
-            -c src/Distribution/Pot/HaskellSourceParser.lhs \
-            -o $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
-            -i$(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package attoparsec -package base -package filepath -package text \
+            -c src/Distribution/Pot/HaskellSourceParser.lhs -o \
+            $(BUILD)/Distribution/Pot/HaskellSourceParser.o -i$(BUILD)/
+
 
 $(BUILD)/Distribution/Pot/Types.o : src/Distribution/Pot/Types.lhs
 	-mkdir -p $(BUILD)/Distribution/Pot/
-	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/  \
-            -package base \
-            -package text \
-            -c src/Distribution/Pot/Types.lhs \
-            -o $(BUILD)/Distribution/Pot/Types.o \
-            -i$(BUILD)/
+	$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \
+            -package base -package text -c src/Distribution/Pot/Types.lhs -o \
+            $(BUILD)/Distribution/Pot/Types.o -i$(BUILD)/
+
 $(BUILD)/SummarizeSources : $(BUILD)/SummarizeSources.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
             $(BUILD)/Distribution/Pot/InstalledPackages.o \
@@ -159,22 +124,15 @@ $(BUILD)/SummarizeSources : $(BUILD)/SummarizeSources.o \
             $(BUILD)/Distribution/Pot/Types.o
 	-mkdir -p $(BUILD)/
 	$(HL) $(HL_OPTS) $(SUMMARIZESOURCES_EXTRA) \
-            -o $(BUILD)/SummarizeSources \
-            $(BUILD)/SummarizeSources.o \
+            -o $(BUILD)/SummarizeSources $(BUILD)/SummarizeSources.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
             $(BUILD)/Distribution/Pot/InstalledPackages.o \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.o \
-            $(BUILD)/Distribution/Pot/Types.o \
-            -package Cabal \
-            -package attoparsec \
-            -package base \
-            -package directory \
-            -package filepath \
-            -package groom \
-            -package mtl \
-            -package process \
-            -package split \
+            $(BUILD)/Distribution/Pot/Types.o -package Cabal -package \
+            attoparsec -package base -package directory -package filepath \
+            -package groom -package mtl -package process -package split \
             -package text
+
 
 $(BUILD)/TestHaskellSourceParser : $(BUILD)/TestHaskellSourceParser.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
@@ -184,12 +142,9 @@ $(BUILD)/TestHaskellSourceParser : $(BUILD)/TestHaskellSourceParser.o \
             -o $(BUILD)/TestHaskellSourceParser \
             $(BUILD)/TestHaskellSourceParser.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
-            $(BUILD)/Distribution/Pot/Types.o \
-            -package attoparsec \
-            -package base \
-            -package filepath \
-            -package groom \
-            -package text
+            $(BUILD)/Distribution/Pot/Types.o -package attoparsec -package \
+            base -package filepath -package groom -package text
+
 
 $(BUILD)/SavePackages : $(BUILD)/SavePackages.o \
             $(BUILD)/Distribution/Pot/DeepDependencies.o \
@@ -199,23 +154,16 @@ $(BUILD)/SavePackages : $(BUILD)/SavePackages.o \
             $(BUILD)/Distribution/Pot/Types.o
 	-mkdir -p $(BUILD)/
 	$(HL) $(HL_OPTS) $(SAVEPACKAGES_EXTRA) \
-            -o $(BUILD)/SavePackages \
-            $(BUILD)/SavePackages.o \
+            -o $(BUILD)/SavePackages $(BUILD)/SavePackages.o \
             $(BUILD)/Distribution/Pot/DeepDependencies.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
             $(BUILD)/Distribution/Pot/InstalledPackages.o \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.o \
-            $(BUILD)/Distribution/Pot/Types.o \
-            -package Cabal \
-            -package attoparsec \
-            -package base \
-            -package directory \
-            -package filemanip \
-            -package filepath \
-            -package mtl \
-            -package process \
-            -package split \
+            $(BUILD)/Distribution/Pot/Types.o -package Cabal -package \
+            attoparsec -package base -package directory -package filemanip \
+            -package filepath -package mtl -package process -package split \
             -package text
+
 
 $(BUILD)/MakeHaskellMake : $(BUILD)/MakeHaskellMake.o \
             $(BUILD)/Distribution/Pot/DeepDependencies.o \
@@ -226,24 +174,17 @@ $(BUILD)/MakeHaskellMake : $(BUILD)/MakeHaskellMake.o \
             $(BUILD)/Distribution/Pot/Types.o
 	-mkdir -p $(BUILD)/
 	$(HL) $(HL_OPTS) $(MAKEHASKELLMAKE_EXTRA) \
-            -o $(BUILD)/MakeHaskellMake \
-            $(BUILD)/MakeHaskellMake.o \
+            -o $(BUILD)/MakeHaskellMake $(BUILD)/MakeHaskellMake.o \
             $(BUILD)/Distribution/Pot/DeepDependencies.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
             $(BUILD)/Distribution/Pot/InstalledPackages.o \
             $(BUILD)/Distribution/Pot/MakefileGen.o \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.o \
-            $(BUILD)/Distribution/Pot/Types.o \
-            -package Cabal \
-            -package attoparsec \
-            -package base \
-            -package directory \
-            -package filepath \
-            -package mtl \
-            -package process \
-            -package split \
-            -package text \
+            $(BUILD)/Distribution/Pot/Types.o -package Cabal -package \
+            attoparsec -package base -package directory -package filepath \
+            -package mtl -package process -package split -package text \
             -package time
+
 
 $(BUILD)/CabalLint : $(BUILD)/CabalLint.o \
             $(BUILD)/Distribution/Pot/CabalLint.o \
@@ -254,24 +195,17 @@ $(BUILD)/CabalLint : $(BUILD)/CabalLint.o \
             $(BUILD)/Distribution/Pot/Types.o
 	-mkdir -p $(BUILD)/
 	$(HL) $(HL_OPTS) $(CABALLINT_EXTRA) \
-            -o $(BUILD)/CabalLint \
-            $(BUILD)/CabalLint.o \
+            -o $(BUILD)/CabalLint $(BUILD)/CabalLint.o \
             $(BUILD)/Distribution/Pot/CabalLint.o \
             $(BUILD)/Distribution/Pot/DeepDependencies.o \
             $(BUILD)/Distribution/Pot/HaskellSourceParser.o \
             $(BUILD)/Distribution/Pot/InstalledPackages.o \
             $(BUILD)/Distribution/Pot/RecursiveGetSources.o \
-            $(BUILD)/Distribution/Pot/Types.o \
-            -package Cabal \
-            -package attoparsec \
-            -package base \
-            -package directory \
-            -package filepath \
-            -package mtl \
-            -package packdeps \
-            -package process \
-            -package split \
+            $(BUILD)/Distribution/Pot/Types.o -package Cabal -package \
+            attoparsec -package base -package directory -package filepath \
+            -package mtl -package packdeps -package process -package split \
             -package text
+
 
 
 %.hi : %.o

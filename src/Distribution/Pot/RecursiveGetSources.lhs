@@ -16,6 +16,7 @@
 > import Control.Applicative
 > import Data.Maybe
 > import System.Directory
+> import Control.Arrow
 
 > -- | takes a set of source files (these should be your exposed modules and/or exe sources)
 > -- and recurses through the imports to find all the local source files needed, and to
@@ -41,7 +42,7 @@
 >           return (fn,(root,i))
 >   -- run the recursion
 >   execStateT (mapM (uncurry (annotate pkgs rootFolders)
->                     . (\(fn,(_,i)) -> (fn,i))) rs) []
+>                     . (second snd)) rs) []
 
 > moduleNameToFileName :: T.Text -> FilePath
 > moduleNameToFileName = map (\x -> case x of
@@ -69,7 +70,6 @@ also check the package list
 >                      ,sdModuleName = siModuleName ssi
 >                      ,sdImports = sort $ nub iis}
 >   modify (a:)
->   return ()
 >   where
 >     afs :: T.Text -> St [ImportInfo]
 >     afs ip = do
