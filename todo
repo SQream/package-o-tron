@@ -11,6 +11,14 @@ add other-modules with internal and exposed modules to caballint
 remove package-o-tron from caballist
 run without --hide-package on haskell98 and on package-o-tron
 
+add dot visualization of dependencies
+
+bugs in make
+if file has wrong module it breaks in wrong place
+when generating dependencies, should error if import not found
+running make on new system: doesn't report all the missing packages at
+   once
+
 3
 check cabal --dry-run for dups/ not latest version:
 cabal already reports reinstall and new version, highlight these a lot
