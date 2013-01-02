@@ -13,16 +13,27 @@ run without --hide-package on haskell98 and on package-o-tron
 
 add dot visualization of dependencies
 
-bugs in make
-if file has wrong module it breaks in wrong place
-when generating dependencies, should error if import not found
+bugs in make operation
+when generating dependencies, should error if import not found, and
+   should report inconsistent filenames/ modulenames when parsing
+   files
 running make on new system: doesn't report all the missing packages at
-   once
+   once -> add a new target in the generated makefile which displays
+   packages for an exe/lib or everything, want to be able to bootstrap
+   on a fresh system, so want a complete list of packages to install
+   in one go
+
+extend to support c and c++, exes and shared libs
+
+ability to do shared libs and profile builds with th code for haskell
+   (need to build .o files twice?)
 
 3
 check cabal --dry-run for dups/ not latest version:
 cabal already reports reinstall and new version, highlight these a lot
    better and add highlight for versions which aren't the latest
+   (update: cabal seems to be a bit fickle about reporting installing
+   new versions of already installed packages consistently ...)
 package database checker: dup versions, non latest versions
 see http://hackage.haskell.org/package/highlight-versions
 

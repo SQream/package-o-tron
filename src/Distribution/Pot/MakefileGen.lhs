@@ -160,7 +160,7 @@ specifies the -o explicitly since ghc outputs modules with a main as
 > ppCM cm =
 >     cmObjName cm ++ " : "
 >     ++ intercalate nl (cmDependencies cm)
->     ++ "\n\t-@mkdir -p " ++ dropFileName (cmObjName cm)
+>     ++ "\n\t@mkdir -p " ++ dropFileName (cmObjName cm)
 >     ++ "\n\t@echo HC " ++ cmHsName cm
 >     ++ "\n\t@$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \\\n"
 >     ++ render 12 (map (("-package " ++) . T.unpack) (cmPackages cm)
@@ -172,7 +172,7 @@ specifies the -o explicitly since ghc outputs modules with a main as
 > ppEL el =
 >   elExeName el ++ " : "
 >   ++ intercalate nl (elObjects el)
->   ++ "\n\t-@mkdir -p $(BUILD)/"
+>   ++ "\n\t@mkdir -p $(BUILD)/"
 >   ++ "\n\t@echo HL " ++ elExeName el
 >   ++ "\n\t@$(HL) $(HL_OPTS) $(" ++ elMangledExeName el
 >   ++ ") \\\n"
