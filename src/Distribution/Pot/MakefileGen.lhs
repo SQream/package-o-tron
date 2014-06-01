@@ -176,7 +176,6 @@ specifies the -o explicitly since ghc outputs modules with a main as
 >        ++ "\n\t@mkdir -p " ++ dropFileName (cmObjName cm)
 >        ++ "\n\t@echo HC " ++ cmHsName cm
 >        ++ cx -- ++ "\n" ++ dx
->        
 
 > ppEL :: ExeLink -> String
 > ppEL el =
