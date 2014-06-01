@@ -133,7 +133,7 @@ check with a bunch of packages on hackage
 >       benchmarksSis = [] -- TODO
 >       sis = maybeToList libSi ++ exeSis ++ testsSis ++ benchmarksSis
 >   -- do the checks
->   pkgs <- filter ((`notElem` hidePackages) . piName) <$> readPackages
+>   pkgs <- filter ((`notElem` hidePackages) . piName) <$> readPackages Nothing
 >   (uis,ais,eos,mos,eds,mds) <- unzip6 <$> mapM (checkModulesAndPackages pkgs libPi) sis
 >   badPvs <- checkNewestVersions cabalFn
 >   let fi = filter (not . null . snd)

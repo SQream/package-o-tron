@@ -85,12 +85,13 @@ good error message in this case also for same reason
 
 
 > -- | Analyze a set of files and produce the information needed to generate a makefile
-> makefileGen :: [FilePath] -- ^ the folders where the source lives (same as -i for ghc)
+> makefileGen :: Maybe FilePath -- ^ custom package db to use instead of user
+>             -> [FilePath] -- ^ the folders where the source lives (same as -i for ghc)
 >             -> [FilePath] -- ^ the root sources, i.e. your exposed modules and/or mains
 >             -> [T.Text] -- ^ list of package names to hide
 >             -> IO MakefileGen
-> makefileGen srcFolders roots hidePackages = do
->   pkgs <- readPackages
+> makefileGen packageDB srcFolders roots hidePackages = do
+>   pkgs <- readPackages packageDB
 >   let srcfs = if null srcFolders
 >               then ["."]
 >               else srcFolders
@@ -158,21 +159,30 @@ specifies the -o explicitly since ghc outputs modules with a main as
 
 > ppCM :: CompileModule -> String
 > ppCM cm =
->     cmObjName cm ++ " : "
->     ++ intercalate nl (cmDependencies cm)
->     ++ "\n\t-@mkdir -p " ++ dropFileName (cmObjName cm)
->     ++ "\n\t@echo HC " ++ cmHsName cm
->     ++ "\n\t@$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \\\n"
->     ++ render 12 (map (("-package " ++) . T.unpack) (cmPackages cm)
->                   ++  ["-c " ++ cmHsName cm
->                       ,"-o " ++ cmObjName cm
->                       ,"-i$(BUILD)/"])
+>     let cx = "\n\t@$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \\\n"
+>              ++ render 12 (map (("-package " ++) . T.unpack) (cmPackages cm)
+>                            ++  ["-c " ++ cmHsName cm
+>                                ,"-o " ++ cmObjName cm
+>                                ,"-i$(BUILD)/"])
+>         _dx = rtrim ("\n\t@$(HC) $(HC_OPTS) -hide-all-packages -outputdir $(BUILD)/ \\\n"
+>              ++ render 12 (map (("-package " ++) . T.unpack) (cmPackages cm)
+>                            ++  ["-c " ++ cmHsName cm
+>                                ,"-o " ++ cmDObjName cm
+>                                ,"-i$(BUILD)/"])) ++ " $(HASKELL_DYN)"
+>         rtrim = reverse . dropWhile isSpace . reverse
+>         cmDObjName x = dropExtension (cmObjName x) `addExtension` ".dyn_o"
+>     in cmObjName cm ++ " : "
+>        ++ intercalate nl (cmDependencies cm)
+>        ++ "\n\t@mkdir -p " ++ dropFileName (cmObjName cm)
+>        ++ "\n\t@echo HC " ++ cmHsName cm
+>        ++ cx -- ++ "\n" ++ dx
+>        
 
 > ppEL :: ExeLink -> String
 > ppEL el =
 >   elExeName el ++ " : "
 >   ++ intercalate nl (elObjects el)
->   ++ "\n\t-@mkdir -p $(BUILD)/"
+>   ++ "\n\t@mkdir -p $(BUILD)/"
 >   ++ "\n\t@echo HL " ++ elExeName el
 >   ++ "\n\t@$(HL) $(HL_OPTS) $(" ++ elMangledExeName el
 >   ++ ") \\\n"

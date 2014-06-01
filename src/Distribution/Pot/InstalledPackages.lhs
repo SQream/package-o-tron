@@ -22,9 +22,13 @@
 >   map piName $ filter ((m `elem`) . piExposedModules) pkgs
 
 > -- | parses the output of ghc-pkg dump
-> readPackages :: IO [PackageInfo]
-> readPackages = do
->   inf <- readProcess "ghc-pkg" ["dump"] ""
+> -- the filepath is to set a different package db from user
+> readPackages :: Maybe FilePath -> IO [PackageInfo]
+> readPackages fp = do
+>   let as = case fp of
+>                Just fp' -> ["--global","--package-db",fp']
+>                Nothing -> []
+>   inf <- readProcess "ghc-pkg" ("dump":as) ""
 >   let pkgs = splitOn "---" inf
 >       is = map parseInstalledPackageInfo pkgs
 >   return $ mapMaybe (\i -> case i of

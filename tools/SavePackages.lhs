@@ -25,13 +25,14 @@ current system also.
 > import System.FilePath
 > import System.Process
 > import System.Exit
+> import Control.Monad
 > --import Text.Groom
 
 > main :: IO ()
 > main = do
 >   opts <- parseArgs `fmap` getArgs
 >   --putStrLn $ show opts
->   pkgs <- readPackages
+>   pkgs <- readPackages Nothing
 >   let srcfs = if null (srcFolders opts)
 >               then ["."]
 >               else srcFolders opts
@@ -50,7 +51,7 @@ current system also.
 >   maybe (putStrLn $ intercalate "\n" wantTarballs)
 >         (\f -> do
 >            createDirectoryIfMissing True f
->            mapM_ (\t -> copyFile t (f </> takeFileName t)) wantTarballs)
+>            mapM_ (\t -> when (t /= "") $ copyFile t (f </> takeFileName t)) wantTarballs)
 >         $ outputFolder opts
 >   where
 >     findTarball cust l p = do
@@ -70,7 +71,9 @@ current system also.
 >                return tfn
 >         Nothing ->
 >             case cands of
->                        [] -> error $ "no tarball for " ++ T.unpack p
+>                        [] -> do
+>                              putStrLn $ "WARNING: no tarball for " ++ T.unpack p
+>                              return ""
 >                        [x] -> return x
 >                        -- todo: get the latest tarball, or get the installed version
 >                        -- or something

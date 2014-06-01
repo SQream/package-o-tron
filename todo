@@ -17,7 +17,15 @@ bugs in make
 if file has wrong module it breaks in wrong place
 when generating dependencies, should error if import not found
 running make on new system: doesn't report all the missing packages at
-   once
+   once -> add a new target in the generated makefile which displays
+   packages for an exe/lib or everything, want to be able to bootstrap
+   on a fresh system, so want a complete list of packages to install
+   in one go
+
+extend to support c and c++, exes and shared libs
+
+ability to do shared libs and profile builds with th code for haskell
+   (need to build .o files twice?)
 
 3
 check cabal --dry-run for dups/ not latest version:
