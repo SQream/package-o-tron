@@ -1,5 +1,5 @@
 name:                package-o-tron
-version:             0.2.0.0
+version:             0.2.0.1
 synopsis:            Dependencies for haskell source for .cabal files, Makefiles and other utils
 description:         Utilities to check cabal files, create Makefiles for
                      Haskell projects, etc.. See the README for more information:

@@ -54,6 +54,7 @@ between the start of the line and the end of the module name
 >     sws
 >     mn <- dottedIden
 >     dropTillEndOfLineAndSkipLines
+>     option () (void (string "where") >> dropTillEndOfLineAndSkipLines)
 >     return mn
 
 > importp :: Parser T.Text
